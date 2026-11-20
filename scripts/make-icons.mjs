@@ -6,7 +6,7 @@ try { sharp = (await import('sharp')).default; } catch { console.error('Pasang d
 
 const svg = readFileSync('public/favicon.svg');
 const sizes = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
-const fg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108"><rect x="32" y="28" width="44" height="52" rx="8" fill="#fff"/><path d="M43 55l8 8 15-16" fill="none" stroke="#4F46E5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`);
+const fg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108"><rect x="32" y="28" width="44" height="52" rx="8" fill="#F4B8D9"/><path d="M43 55l8 8 15-16" fill="none" stroke="#111111" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`);
 for (const [d, px] of Object.entries(sizes)) {
   const dir = join('native', 'android-res', `mipmap-${d}`);
   mkdirSync(dir, { recursive: true });

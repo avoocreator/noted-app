@@ -66,7 +66,7 @@ export const defaultSettings = (): Settings => ({
   bagOn: true,
   bagTime: '19:30',
   theme: 'auto',
-  accent: 'indigo',
+  accent: 'pink',
 });
 
 export const createDB = (): DB => ({ v: 1, rev: 0, tasks: [], notes: [], schedule: emptySchedule(), settings: defaultSettings() });

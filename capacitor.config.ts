@@ -5,6 +5,6 @@ const config: CapacitorConfig = {
   appName: 'Noted',
   webDir: 'dist',
   android: { allowMixedContent: false },
-  plugins: { LocalNotifications: { smallIcon: 'ic_stat_noted', iconColor: '#4F46E5' } },
+  plugins: { LocalNotifications: { smallIcon: 'ic_stat_noted', iconColor: '#111111' } },
 };
 export default config;

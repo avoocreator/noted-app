@@ -53,6 +53,6 @@ if (existsSync(res)) {
 // 4) Warna latar splash/ikon adaptif
 const colors = join(android, 'app', 'src', 'main', 'res', 'values', 'ic_launcher_background.xml');
 mkdirSync(join(android, 'app', 'src', 'main', 'res', 'values'), { recursive: true });
-writeFileSync(colors, '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#4F46E5</color>\n</resources>\n');
+writeFileSync(colors, '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <color name="ic_launcher_background">#111111</color>\n</resources>\n');
 
 console.log('Android dipatch: tanda tangan, versi, izin, ikon.');

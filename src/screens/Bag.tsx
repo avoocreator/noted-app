@@ -71,7 +71,7 @@ export function Bag() {
       )}
 
       {bag.subjects.length > 0 && (
-        <section className="group">
+        <section className="panel blue">
           <h3>Pelajaran besok <i>{bag.subjects.length}</i></h3>
           <div className="chips static">{bag.subjects.map((s) => <span key={s} className="chip">{s}</span>)}</div>
         </section>

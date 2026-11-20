@@ -6,7 +6,7 @@ import { saveBackupFile } from '../data/share.ts';
 import { useStore } from '../data/store.ts';
 import { Switch } from '../ui/Switch.tsx';
 
-const ACCENTS: [Accent, string][] = [['indigo', '#4F46E5'], ['green', '#16A34A'], ['orange', '#EA580C'], ['pink', '#DB2777']];
+const ACCENTS: [Accent, string][] = [['pink', '#F4B8D9'], ['indigo', '#B5C8EE'], ['green', '#A9BD77'], ['orange', '#F3D55B']];
 
 export function Settings() {
   const db = useStore((s) => s.db);
