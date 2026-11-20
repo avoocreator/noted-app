@@ -23,6 +23,7 @@ Tujuan: memastikan orang awam paham **tanpa dijelaskan**.
 - [ ] Pasang versi baru di atas yang lama: data tetap ada.
 - [ ] Cadangan → hapus aplikasi → pasang → pulihkan: data kembali.
 - [ ] Tombol Kembali menutup lembar, lalu ke tab pertama, lalu keluar.
+- [ ] Widget: pasang *Tas Besok* dan *Hari ini* di layar utama. Tambah tugas di aplikasi → widget ikut berubah dalam beberapa detik. Cek setelah lewat tengah malam, dan saat widget diperbesar/diperkecil (jumlah baris menyesuaikan).
 - [ ] Kode kelas: satu HP membagikan, HP lain mengimpor.
 
 ## Ukuran keberhasilan

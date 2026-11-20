@@ -5,6 +5,7 @@ import { loadDB, saveDB } from './storage.ts';
 import { applyPlan, isNative } from './notify.ts';
 import { planNotifications } from '../lib/plan.ts';
 import { makeTask, toggleDone, type NewTask } from '../lib/tasks.ts';
+import { refreshWidgets } from './widget.ts';
 
 export type Tab = 'week' | 'bag' | 'notes' | 'settings';
 
@@ -131,7 +132,7 @@ let planTimer: number | undefined;
 function flush() {
   window.clearTimeout(saveTimer);
   saveTimer = undefined;
-  void saveDB(useStore.getState().db).then(() => useStore.setState({ lastSaved: Date.now() }));
+  void saveDB(useStore.getState().db).then(() => { useStore.setState({ lastSaved: Date.now() }); void refreshWidgets(); });
 }
 function replan(force = false) {
   window.clearTimeout(planTimer);
@@ -159,4 +160,5 @@ export async function bootstrap(): Promise<void> {
     void CapApp.addListener('appStateChange', (st) => { if (!st.isActive && saveTimer !== undefined) flush(); if (st.isActive) replan(); });
   }
   replan(true);
+  void refreshWidgets();
 }

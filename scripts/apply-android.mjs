@@ -40,7 +40,38 @@ let m = read(manPath);
 for (const perm of ['android.permission.POST_NOTIFICATIONS', 'android.permission.SCHEDULE_EXACT_ALARM', 'android.permission.RECEIVE_BOOT_COMPLETED']) {
   if (!m.includes(perm)) m = m.replace('</manifest>', `    <uses-permission android:name="${perm}" />\n</manifest>`);
 }
+// widget layar utama (receiver untuk Tas Besok dan Hari ini)
+const receiver = (cls, label, info) => `
+        <receiver android:name=".${cls}" android:exported="true" android:label="@string/${label}">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/${info}" />
+        </receiver>
+`;
+if (!m.includes('.BagWidget')) m = m.replace('</application>', `${receiver('BagWidget', 'widget_bag_name', 'noted_bag_widget_info')}${receiver('TodayWidget', 'widget_today_name', 'noted_today_widget_info')}    </application>`);
 writeFileSync(manPath, m);
+
+// kode native widget + plugin Capacitor
+const src = join(root, 'native', 'android-src', 'java');
+const javaRoot = join(android, 'app', 'src', 'main', 'java');
+if (existsSync(src)) cpSync(src, javaRoot, { recursive: true });
+
+// daftarkan plugin NotedWidget di MainActivity
+const mainPath = join(javaRoot, 'app', 'noted', 'mobile', 'MainActivity.java');
+if (existsSync(mainPath)) {
+  let a = read(mainPath);
+  if (!a.includes('NotedWidgetPlugin')) {
+    const patched = a.replace(/public class MainActivity extends BridgeActivity\s*\{\s*\}/, `public class MainActivity extends BridgeActivity {\n    @Override\n    public void onCreate(android.os.Bundle savedInstanceState) {\n        registerPlugin(NotedWidgetPlugin.class);\n        super.onCreate(savedInstanceState);\n    }\n}`);
+    if (patched === a) console.warn('MainActivity.java tidak dikenali: tambahkan registerPlugin(NotedWidgetPlugin.class) sebelum super.onCreate() secara manual.');
+    else writeFileSync(mainPath, patched);
+  }
+} else {
+  console.warn('MainActivity.java tidak ditemukan; widget tidak akan ikut diperbarui saat data berubah.');
+}
 
 // 3) Ikon + ikon notifikasi
 const res = join(root, 'native', 'android-res');

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_bag_name">Noted · Tas Besok</string>
+    <string name="widget_bag_desc">Pelajaran besok dan apa yang harus dibawa atau dikumpul.</string>
+    <string name="widget_today_name">Noted · Hari ini</string>
+    <string name="widget_today_desc">Tugas yang jatuh tempo hari ini dan yang terlambat.</string>
+</resources>

@@ -74,11 +74,9 @@ export function ScheduleEditor() {
         </ol>
       )}
 
-      {suggestions.length > 0 && (
-        <div className="chips" role="group" aria-label="Tambah mapel">
-          {suggestions.map((c) => <button key={c} className="chip" onClick={() => add(c)}>+ {c}</button>)}
-        </div>
-      )}
+      <div className="chips" role="group" aria-label="Tambah mapel">
+        {suggestions.map((c) => <button key={c} className="chip" onClick={() => add(c)}>+ {c}</button>)}
+      </div>
       <form className="quick" onSubmit={(e) => { e.preventDefault(); add(text); }}>
         <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Mapel lain (boleh singkatan, mis. KIM)" aria-label="Mapel lain" />
         <button className="btn primary" type="submit" disabled={!text.trim()}>Tambah</button>

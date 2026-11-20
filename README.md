@@ -12,6 +12,7 @@ Tanpa akun, tanpa server. Data ada di HP dalam satu berkas JSON.
 - **Pengingat**: notifikasi lokal pada jam tugas, H-1, dan Tas Besok.
 - **Tas Besok**: daftar kumpul/bawa untuk besok, centang sampai "Tas siap ✓".
 - **Jadwal pelajaran** manual, bisa dibagikan sebagai **kode kelas** (teks `NOTED1-…`).
+- **Widget layar utama** (Android): *Tas Besok* (pelajaran besok + barang bawa/kumpul, "Tas siap ✓") dan *Hari ini* (tugas jatuh tempo + terlambat). Ketuk widget untuk membuka Noted; tahan layar utama → Widget → Noted.
 - **Catatan** sederhana (poin, nomor, daftar centang).
 - **Cadangan** JSON.
 
@@ -40,12 +41,13 @@ src/data/     penyimpanan, notifikasi, berbagi, store zustand
 src/ui/       komponen bersama
 src/screens/  layar
 scripts/      patch Android, pembuat ikon
-native/       ikon & drawable Android
+native/       ikon, drawable, layout & kode Java widget Android
 ```
 
 ## Catatan jujur
 - Kode ini **belum pernah dibangun dan dijalankan di perangkat**; hanya logika di `src/lib` yang dites otomatis. Ekspektasikan beberapa perbaikan kecil saat build pertama.
 - Keandalan pengingat di Xiaomi/Oppo/Vivo dan izin alarm tepat waktu (Android 12+) belum diuji.
+- Widget ditulis dalam Java native (`native/android-src`) dan **belum pernah dikompilasi**; diperbarui tiap data disimpan, tiap ganti hari, dan tiap 30 menit. Bila `MainActivity.java` tidak terpatch otomatis, tambahkan `registerPlugin(NotedWidgetPlugin.class);` sebelum `super.onCreate(...)`.
 - Belum ada suara alarm kustom (hanya suara notifikasi bawaan sistem).
 - Catatan hanya teks polos dengan poin/nomor/centang.
 - Kode kelas hanya teks, belum ada QR.
