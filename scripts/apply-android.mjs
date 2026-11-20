@@ -40,6 +40,18 @@ let m = read(manPath);
 for (const perm of ['android.permission.POST_NOTIFICATIONS', 'android.permission.SCHEDULE_EXACT_ALARM', 'android.permission.RECEIVE_BOOT_COMPLETED']) {
   if (!m.includes(perm)) m = m.replace('</manifest>', `    <uses-permission android:name="${perm}" />\n</manifest>`);
 }
+
+// share intent (menerima teks dari WhatsApp dan aplikasi lain ke MainActivity)
+const sendFilter = `
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>`;
+if (!m.includes('android.intent.action.SEND')) {
+  m = m.replace(/(android:name="\.MainActivity"[^>]*>[\s\S]*?)(<\/activity>)/, `$1${sendFilter}\n        $2`);
+}
+
 // widget layar utama (receiver untuk Tas Besok dan Hari ini)
 const receiver = (cls, label, info) => `
         <receiver android:name=".${cls}" android:exported="true" android:label="@string/${label}">
