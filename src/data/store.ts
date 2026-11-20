@@ -6,6 +6,7 @@ import { applyPlan, isNative } from './notify.ts';
 import { planNotifications } from '../lib/plan.ts';
 import { makeTask, toggleDone, type NewTask } from '../lib/tasks.ts';
 import { refreshWidgets } from './widget.ts';
+import { initIntentListener } from './intent.ts';
 
 export type Tab = 'week' | 'bag' | 'notes' | 'settings';
 
@@ -21,6 +22,7 @@ interface State {
   editTask: string | null;
   scheduleOpen: boolean;
   pasteOpen: boolean;
+  incomingText: string | null;
   toasts: Toast[];
   lastSaved: number;
 
@@ -30,6 +32,7 @@ interface State {
   setEditTask: (id: string | null) => void;
   setScheduleOpen: (b: boolean) => void;
   setPasteOpen: (b: boolean) => void;
+  setIncomingText: (text: string | null) => void;
 
   addTask: (p: NewTask) => Task;
   addTasks: (list: NewTask[]) => number;
@@ -61,6 +64,7 @@ export const useStore = create<State>((set, get) => {
     editTask: null,
     scheduleOpen: false,
     pasteOpen: false,
+    incomingText: null,
     toasts: [],
     lastSaved: 0,
 
@@ -72,7 +76,8 @@ export const useStore = create<State>((set, get) => {
     setOpenNote: (openNote) => set({ openNote }),
     setEditTask: (editTask) => set({ editTask }),
     setScheduleOpen: (scheduleOpen) => set({ scheduleOpen }),
-    setPasteOpen: (pasteOpen) => set({ pasteOpen }),
+    setPasteOpen: (pasteOpen) => set((s) => ({ pasteOpen, incomingText: pasteOpen ? s.incomingText : null })),
+    setIncomingText: (incomingText) => set({ incomingText }),
 
     addTask: (p) => {
       const t = makeTask(p);
@@ -161,4 +166,7 @@ export async function bootstrap(): Promise<void> {
   }
   replan(true);
   void refreshWidgets();
+  void initIntentListener((text) => {
+    useStore.setState({ incomingText: text, pasteOpen: true });
+  });
 }

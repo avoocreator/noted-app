@@ -112,6 +112,8 @@ textarea { resize: vertical; }
 .meta { display: flex; gap: 6px; flex-wrap: wrap; }
 .tag, .when { font-style: normal; font-size: .75rem; border-radius: 999px; padding: 2px 10px; display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); color: var(--muted); }
 .tag.kumpul { background: var(--pink); color: var(--on-pastel); } .tag.bawa { background: var(--yellow); color: var(--on-pastel); } .tag.subj { background: var(--blue); color: var(--on-pastel); }
+.tag.green { background: var(--green); color: var(--on-pastel); font-weight: 600; }
+.tag.warn { background: var(--warn-bg); color: var(--text); font-weight: 600; }
 .when.late { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); } .when.dim { background: none; padding: 0; }
 
 .empty { text-align: center; padding: 36px 12px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
