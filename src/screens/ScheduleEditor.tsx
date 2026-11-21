@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { DAYS_ID } from '../lib/dates.ts';
-import { classMessage, decodeSchedule } from '../lib/classcode.ts';
+import { classMessage, decodeSchedule, encodeSchedule } from '../lib/classcode.ts';
 import { copyDay, hasSchedule, knownSubjects, SCHOOL_DAYS, setDay } from '../lib/schedule.ts';
 import { COMMON_SUBJECTS, displaySubject, sameSubject } from '../lib/subjects.ts';
 import { shareText } from '../data/share.ts';
 import { useStore } from '../data/store.ts';
 import { Icon } from '../ui/Icon.tsx';
 import { Sheet } from '../ui/Sheet.tsx';
+import { QrModal } from '../ui/QrModal.tsx';
 
 /** Isi jadwal pelajaran per hari. Tanpa jam: yang dibutuhkan hanya hari dan daftar mapel. */
 export function ScheduleEditor() {
@@ -18,6 +19,7 @@ export function ScheduleEditor() {
   const [day, setDay_] = useState(initial);
   const [text, setText] = useState('');
   const [code, setCode] = useState('');
+  const [showQr, setShowQr] = useState(false);
 
   const list = schedule[day] ?? [];
   const put = (l: string[]) => setSchedule(setDay(schedule, day, l));
@@ -94,12 +96,19 @@ export function ScheduleEditor() {
 
       <hr />
       <h3 className="sub">Bagikan ke teman sekelas</h3>
-      <p className="muted">Satu orang cukup mengisi. Yang lain menempel kodenya di bawah, tanpa mengetik ulang.</p>
-      <button className="btn soft" onClick={() => void share()}><Icon name="share" size={18} /> Bagikan jadwal</button>
+      <p className="muted">Satu orang cukup mengisi. Yang lain menempel kodenya di bawah atau memindai QR langsung.</p>
+      <div className="row wrap gap">
+        <button className="btn soft" onClick={() => void share()}><Icon name="share" size={18} /> Bagikan teks</button>
+        <button className="btn soft" onClick={() => {
+          if (!hasSchedule(schedule)) { toast('Isi jadwal dulu'); return; }
+          setShowQr(true);
+        }}><Icon name="qr" size={18} /> Tampilkan QR</button>
+      </div>
 
       <h3 className="sub">Impor dari kode kelas</h3>
       <textarea className="paste-area" rows={3} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Tempel pesan atau kode NOTED1-… dari temanmu" aria-label="Kode kelas" />
       <button className="btn soft" disabled={!code.trim()} onClick={importCode}>Impor jadwal</button>
+      {showQr && <QrModal title="QR Jadwal Kelas" code={encodeSchedule(schedule)} onClose={() => setShowQr(false)} />}
     </Sheet>
   );
 }

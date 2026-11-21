@@ -22,6 +22,7 @@ const P = {
   list: 'M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01',
   listOl: 'M10 6h10M10 12h10M10 18h10M4 5l1.5-1v4M4 11h3l-3 4h3M4 17h3v1.5H5.5M4 21h3',
   checkSq: 'M4 4h16v16H4zM8 12.5l3 3 5-6',
+  qr: 'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z',
 } as const;
 
 export type IconName = keyof typeof P;
