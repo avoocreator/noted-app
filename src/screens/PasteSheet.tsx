@@ -8,7 +8,6 @@ import { Sheet } from '../ui/Sheet.tsx';
 
 type Row = Pasted & { on: boolean };
 
-/** Tempel pesan grup kelas → Noted mengambil tenggat dan mapel → periksa → tambah. */
 export function PasteSheet() {
   const db = useStore((s) => s.db);
   const addTasks = useStore((s) => s.addTasks);

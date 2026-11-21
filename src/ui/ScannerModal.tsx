@@ -55,9 +55,7 @@ export function ScannerModal({
       for (const track of streamRef.current.getTracks()) {
         try {
           track.stop();
-        } catch {
-          // ignore
-        }
+        } catch {}
       }
       streamRef.current = null;
     }
@@ -137,18 +135,14 @@ export function ScannerModal({
                     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
                       try {
                         navigator.vibrate(40);
-                      } catch {
-                        // ignore
-                      }
+                      } catch {}
                     }
                     stopCamera();
                     onScan(raw);
                     return;
                   }
                 }
-              } catch {
-                // ignore frame read error
-              }
+              } catch {}
             }
             if (activeRef.current) {
               timerRef.current = window.setTimeout(() => void scanFrame(), 200);

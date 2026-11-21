@@ -4,6 +4,7 @@ import { planSignature, type Planned } from '../lib/plan.ts';
 
 export const isNative = () => Capacitor.isNativePlatform();
 
+// Permissions
 export type Perm = 'granted' | 'denied' | 'prompt' | 'unsupported';
 
 export async function checkPermission(): Promise<Perm> {
@@ -22,7 +23,7 @@ export async function requestPermission(): Promise<Perm> {
   } catch { return 'unsupported'; }
 }
 
-/** Android 12+: alarm tepat waktu butuh izin khusus. true = sudah boleh (atau tidak berlaku). */
+// Exact alarm
 export async function exactAlarmAllowed(): Promise<boolean> {
   if (!isNative()) return true;
   try {
@@ -36,7 +37,7 @@ export async function openExactAlarmSettings(): Promise<void> {
   try {
     const ln = LocalNotifications as unknown as { changeExactNotificationSetting?: () => Promise<unknown> };
     await ln.changeExactNotificationSetting?.();
-  } catch { /* pengguna membuka sendiri lewat pengaturan sistem */ }
+  } catch {}
 }
 
 let channelsReady = false;
@@ -46,13 +47,13 @@ async function ensureChannels() {
     await LocalNotifications.createChannel({ id: 'noted-tugas', name: 'Pengingat tugas', description: 'Tenggat dan pengingat sehari sebelumnya', importance: 4, visibility: 1, vibration: true });
     await LocalNotifications.createChannel({ id: 'noted-tas', name: 'Tas Besok', description: 'Ringkasan malam: pelajaran, yang dikumpul, dan yang dibawa besok', importance: 4, visibility: 1, vibration: true });
     channelsReady = true;
-  } catch { /* plugin belum siap; dicoba lagi pada pemanggilan berikutnya */ }
+  } catch {}
 }
 
 let applied = '';
 let busy: Promise<void> = Promise.resolve();
 
-/** Ganti seluruh jadwal notifikasi dengan rencana terbaru. Dilewati bila rencana tidak berubah. */
+// Scheduling
 export function applyPlan(plan: Planned[], force = false): Promise<void> {
   busy = busy.then(async () => {
     if (!isNative()) return;
@@ -63,7 +64,7 @@ export function applyPlan(plan: Planned[], force = false): Promise<void> {
       const pending = await LocalNotifications.getPending();
       if (pending.notifications.length) await LocalNotifications.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
       if (plan.length) {
-        if ((await checkPermission()) !== 'granted') return; // tidak ada izin: jangan tandai "sudah diterapkan"
+        if ((await checkPermission()) !== 'granted') return;
         await LocalNotifications.schedule({
           notifications: plan.map((p) => ({
             id: p.id,
@@ -77,12 +78,12 @@ export function applyPlan(plan: Planned[], force = false): Promise<void> {
         });
       }
       applied = sig;
-    } catch { /* dicoba lagi saat data berubah atau aplikasi dibuka */ }
+    } catch {}
   });
   return busy;
 }
 
-/** Notifikasi percobaan (5 detik lagi) supaya pengguna bisa memastikan izin dan suara berfungsi. */
+// Test notification
 export async function sendTest(): Promise<boolean> {
   if (!isNative()) return false;
   try {

@@ -1,8 +1,10 @@
 import { addDays, addMonths, parseYmd, startOfDay, ymd } from './dates.ts';
 import { newId, type Recur, type Task } from './model.ts';
 
+// Types
 export type NewTask = Partial<Omit<Task, 'id' | 'createdAt' | 'done'>> & { title: string };
 
+// Task factory
 export function makeTask(p: NewTask, now = new Date()): Task {
   return {
     id: newId(),
@@ -23,7 +25,7 @@ function advance(due: string, recur: Recur): string {
   return ymd(recur === 'day' ? addDays(d, 1) : recur === 'week' ? addDays(d, 7) : addMonths(d, 1));
 }
 
-/** Centang/batalkan. Tugas berulang yang diselesaikan menghasilkan tugas berikutnya. */
+// Task toggle
 export function toggleDone(t: Task, now = new Date()): { updated: Task; next?: Task } {
   if (t.done) return { updated: { ...t, done: false, doneAt: undefined } };
   const updated: Task = { ...t, done: true, doneAt: now.toISOString() };

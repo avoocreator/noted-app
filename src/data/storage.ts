@@ -2,12 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { createDB, migrate, type DB } from '../lib/model.ts';
 
-/*
- * Data disimpan sebagai satu dokumen JSON di penyimpanan privat aplikasi.
- * Dua slot bergantian (noted-0.json / noted-1.json): bila aplikasi mati saat menulis,
- * hanya satu slot yang rusak dan slot lainnya tetap utuh. Yang dibaca adalah slot valid dengan `rev` tertinggi.
- * Di browser (npm run dev) dipakai localStorage.
- */
+// Storage
 const SLOTS = ['noted-0.json', 'noted-1.json'];
 const LS_KEY = 'noted-db';
 const native = () => Capacitor.isNativePlatform();
@@ -39,7 +34,7 @@ export async function loadDB(): Promise<DB> {
 
 let chain: Promise<void> = Promise.resolve();
 
-/** Simpan berurutan (satu per satu) supaya dua tulisan tidak saling menimpa. */
+// Save
 export function saveDB(db: DB): Promise<void> {
   const next = { ...db, rev: ++rev };
   chain = chain.then(async () => {
@@ -47,7 +42,7 @@ export function saveDB(db: DB): Promise<void> {
     if (native()) {
       await Filesystem.writeFile({ path: SLOTS[next.rev % 2], directory: Directory.Data, encoding: Encoding.UTF8, data: text });
     } else {
-      try { localStorage.setItem(LS_KEY, text); } catch { /* penyimpanan penuh/diblokir */ }
+      try { localStorage.setItem(LS_KEY, text); } catch {}
     }
   }).catch(() => undefined);
   return chain;

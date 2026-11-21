@@ -1,6 +1,7 @@
 import type { Note } from './model.ts';
 import { sameSubject } from './subjects.ts';
 
+// Helpers
 export const noteHeading = (n: Note): string => {
   if (n.title.trim()) return n.title.trim();
   const first = n.body.split('\n').map((l) => l.trim()).find(Boolean);
@@ -14,7 +15,7 @@ export const snippet = (n: Note, max = 90): string => {
   return s.length > max ? s.slice(0, max - 1).trimEnd() + '…' : s;
 };
 
-/** Catatan terbaru dulu; saring dengan kata kunci (judul/isi/mapel) dan mapel. */
+// Filter
 export function filterNotes(notes: Note[], q: string, subject?: string | null): Note[] {
   const needle = q.trim().toLowerCase();
   return notes
@@ -24,18 +25,17 @@ export function filterNotes(notes: Note[], q: string, subject?: string | null): 
 
 const PREFIX = /^(\s*)(•\s|☐\s|☑\s|\d+\.\s)/;
 
-/** Teks awal baris berikutnya saat menekan Enter di dalam daftar ("• ", "2. ", "☐ "); '' bila bukan daftar. */
+// List helpers
 export function continueList(line: string): string {
   const m = PREFIX.exec(line);
   if (!m) return '';
   const mark = m[2];
-  if (line.slice(m[0].length).trim() === '') return ''; // baris kosong → keluar dari daftar
+  if (line.slice(m[0].length).trim() === '') return '';
   if (mark.startsWith('☑')) return m[1] + '☐ ';
   const num = /^(\d+)\.\s/.exec(mark);
   return num ? `${m[1]}${Number(num[1]) + 1}. ` : m[1] + mark;
 }
 
-/** Ubah awalan baris: 'bullet' | 'number' | 'check'; memanggil lagi dengan jenis yang sama menghapusnya. */
 export function toggleLinePrefix(line: string, kind: 'bullet' | 'number' | 'check'): string {
   const target = kind === 'bullet' ? '• ' : kind === 'check' ? '☐ ' : '1. ';
   const m = PREFIX.exec(line);
@@ -45,7 +45,6 @@ export function toggleLinePrefix(line: string, kind: 'bullet' | 'number' | 'chec
   return indent + target + body;
 }
 
-/** Balik ☐ ↔ ☑ pada satu baris. */
 export function flipCheck(line: string): string {
   if (line.includes('☐ ')) return line.replace('☐ ', '☑ ');
   if (line.includes('☑ ')) return line.replace('☑ ', '☐ ');

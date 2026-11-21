@@ -662,18 +662,13 @@ export class QrCode {
 
 export type EccLevel = 'L' | 'M' | 'Q' | 'H';
 
+// SVG Renderer
 export interface QrSvgOptions {
-  /** Quiet zone border around QR modules in modules (default: 4) */
   border?: number;
-  /** Size in pixels for width and height attributes (default: undefined -> responsive via viewBox) */
   size?: number;
-  /** Foreground / module color (default: 'var(--ink, #111111)') */
   fgColor?: string;
-  /** Background color (default: 'var(--card, #fffbf0)') */
   bgColor?: string;
-  /** Error correction level (default: 'M') */
   ecc?: EccLevel;
-  /** Draw modules as 'path' (single compact path) or 'rect' (individual rects) (default: 'path') */
   modulesAs?: 'path' | 'rect';
 }
 

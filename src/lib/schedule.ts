@@ -2,12 +2,12 @@ import { addDays } from './dates.ts';
 import { emptySchedule, type Schedule } from './model.ts';
 import { sameSubject } from './subjects.ts';
 
-/** Senin–Sabtu (indeks getDay). Minggu tidak ditampilkan di editor. */
+// Constants
 export const SCHOOL_DAYS = [1, 2, 3, 4, 5, 6];
 
+// Helpers
 export const hasSchedule = (s: Schedule) => s.some((d) => d.length > 0);
 
-/** Mapel pada tanggal tertentu, tanpa duplikat persis (jam pelajaran berurutan sering mengulang mapel). */
 export function subjectsOn(s: Schedule, d: Date): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -18,7 +18,6 @@ export function subjectsOn(s: Schedule, d: Date): string[] {
   return out;
 }
 
-/** Tanggal pelajaran `subject` berikutnya, SETELAH `from` (maks `horizon` hari). */
 export function nextMeeting(s: Schedule, subject: string, from: Date, horizon = 14): Date | null {
   for (let i = 1; i <= horizon; i++) {
     const d = addDays(from, i);
@@ -27,7 +26,6 @@ export function nextMeeting(s: Schedule, subject: string, from: Date, horizon = 
   return null;
 }
 
-/** Semua mapel di jadwal (unik, urutan pertama muncul). */
 export function knownSubjects(s: Schedule): string[] {
   const seen = new Set<string>();
   const out: string[] = [];

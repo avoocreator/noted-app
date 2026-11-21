@@ -27,7 +27,7 @@ export function App() {
     document.documentElement.dataset.accent = accent;
   }, [theme, accent]);
 
-  // tombol Kembali Android: tutup lapisan teratas, lalu ke tab awal, lalu keluar
+  // Back button
   useEffect(() => {
     const sub = CapApp.addListener('backButton', () => {
       const s = useStore.getState();

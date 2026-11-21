@@ -12,7 +12,6 @@ import { QrModal } from '../ui/QrModal.tsx';
 import { ScannerModal } from '../ui/ScannerModal.tsx';
 import { SchedulePreviewModal } from '../ui/SchedulePreviewModal.tsx';
 
-/** Isi jadwal pelajaran per hari. Tanpa jam: yang dibutuhkan hanya hari dan daftar mapel. */
 export function ScheduleEditor() {
   const schedule = useStore((s) => s.db.schedule);
   const setSchedule = useStore((s) => s.setSchedule);

@@ -4,7 +4,7 @@ import { knownSubjects } from '../lib/schedule.ts';
 import { useStore } from '../data/store.ts';
 import { Icon } from '../ui/Icon.tsx';
 
-/** Posisi baris yang berisi kursor: [awal, akhir) */
+// Helpers
 function lineAt(text: string, pos: number): [number, number] {
   const s = text.lastIndexOf('\n', pos - 1) + 1;
   const e = text.indexOf('\n', pos);
@@ -24,14 +24,12 @@ export function NoteEditor({ id }: { id: string }) {
   const [subject, setSubject] = useState(note?.subject ?? '');
   const [touched, setTouched] = useState(false);
 
-  // simpan otomatis setelah berhenti mengetik
   useEffect(() => {
     if (!touched) return;
     const t = setTimeout(() => update(id, { title, body, subject: subject.trim() || undefined }), 500);
     return () => clearTimeout(t);
   }, [title, body, subject, touched, id, update]);
 
-  // catatan kosong yang ditinggalkan dibuang
   useEffect(() => () => {
     const n = useStore.getState().db.notes.find((x) => x.id === id);
     if (n && !n.title.trim() && !n.body.trim()) useStore.setState((s) => ({ db: { ...s.db, notes: s.db.notes.filter((x) => x.id !== id) } }));
@@ -66,7 +64,7 @@ export function NoteEditor({ id }: { id: string }) {
     if (!/^\s*(•|☐|☑|\d+\.)\s/.test(line)) return;
     ev.preventDefault();
     const next = continueList(line);
-    if (next === '') { edit(body.slice(0, s) + body.slice(e), s); return; } // baris daftar kosong → keluar dari daftar
+    if (next === '') { edit(body.slice(0, s) + body.slice(e), s); return; }
     const ins = '\n' + next;
     edit(body.slice(0, pos) + ins + body.slice(pos), pos + ins.length);
   };

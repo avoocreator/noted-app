@@ -1,6 +1,7 @@
-/** Mata pelajaran umum + singkatan yang lazim di jadwal sekolah. */
+// Types
 export interface SubjectDef { id: string; label: string; aliases: string[] }
 
+// Constants
 export const SUBJECTS: SubjectDef[] = [
   { id: 'matematika', label: 'Matematika', aliases: ['matematika', 'mtk', 'mat', 'math'] },
   { id: 'b-indonesia', label: 'B. Indonesia', aliases: ['bahasa indonesia', 'b indonesia', 'b indo', 'bindo', 'bin'] },
@@ -24,21 +25,16 @@ export const SUBJECTS: SubjectDef[] = [
   { id: 'bk', label: 'BK', aliases: ['bk', 'bimbingan konseling'] },
 ];
 
-/** Pilihan cepat saat jadwal/tugas masih kosong. */
 export const COMMON_SUBJECTS = ['Matematika', 'B. Indonesia', 'B. Inggris', 'IPA', 'IPS', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'PJOK'];
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/**
- * Kunci pembanding mapel: "MTK", "Matematika", "mtk tl" → 'matematika'.
- * Mapel yang tidak dikenal memakai teks yang dinormalisasi.
- */
+// Matcher
 export function subjectKey(name: string): string {
   const n = norm(name);
   if (!n) return '';
   for (const d of SUBJECTS) if (d.aliases.some((a) => norm(a) === n)) return d.id;
-  // "mtktl" / "bigtl": singkatan + akhiran pendek (mis. TL) dianggap mapel yang sama
   for (const d of SUBJECTS) {
     if (d.aliases.some((a) => { const x = norm(a); return x.length >= 3 && n.startsWith(x) && n.length - x.length <= 2; })) return d.id;
   }
@@ -47,18 +43,15 @@ export function subjectKey(name: string): string {
 
 export const sameSubject = (a?: string | null, b?: string | null): boolean => !!a && !!b && subjectKey(a) === subjectKey(b);
 
-/** Nama tampilan yang rapi untuk mapel bawaan ("mtk" → "Matematika"); lainnya apa adanya. */
 export function displaySubject(name: string): string {
   const key = subjectKey(name);
   const def = SUBJECTS.find((d) => d.id === key);
   const n = norm(name);
-  // hanya rapikan bila nama persis alias; "MTK TL" tetap "MTK TL"
   return def && def.aliases.some((a) => norm(a) === n) ? def.label : name.trim();
 }
 
 const wordRe = (term: string) => new RegExp(`(^|[^\\p{L}\\p{N}])${esc(term).replace(/\s+/g, '[\\s.]*')}(?![\\p{L}\\p{N}])`, 'iu');
 
-/** Cari mapel di dalam teks bebas. Mapel yang sudah ada (jadwal/pengguna) menang atas daftar bawaan. */
 export function findSubjectInText(text: string, known: string[] = []): string | undefined {
   for (const k of [...known].sort((a, b) => b.length - a.length)) {
     if (k.trim().length >= 2 && wordRe(k.trim()).test(text)) return k;
@@ -71,7 +64,6 @@ export function findSubjectInText(text: string, known: string[] = []): string | 
   return undefined;
 }
 
-/** Samakan penulisan mapel dengan yang sudah dikenal bila sama; bila tidak, rapikan nama bawaan. */
 export function canonicalSubject(raw: string, known: string[] = []): string {
   const hit = known.find((k) => sameSubject(k, raw) && norm(k) === norm(raw)) ?? known.find((k) => norm(k) === norm(raw));
   return hit ?? displaySubject(raw);

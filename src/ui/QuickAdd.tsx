@@ -7,7 +7,6 @@ import { subjectCounts } from '../lib/week.ts';
 import { useStore } from '../data/store.ts';
 import { Icon } from './Icon.tsx';
 
-/** Kolom tambah tugas: ketik bebas ("PR mtk hal 45 jumat"), pilih mapel dengan satu ketukan. */
 export function QuickAdd() {
   const db = useStore((s) => s.db);
   const addTask = useStore((s) => s.addTask);

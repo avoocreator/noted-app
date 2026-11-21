@@ -1,5 +1,6 @@
 import { parseYmd } from './dates.ts';
 
+// Types
 export type TaskKind = 'tugas' | 'kumpul' | 'bawa';
 export type Priority = 'high' | 'medium' | 'low';
 export type Recur = 'day' | 'week' | 'month';
@@ -7,15 +8,15 @@ export type Recur = 'day' | 'week' | 'month';
 export interface Task {
   id: string;
   title: string;
-  due?: string; // YYYY-MM-DD
-  time?: string; // HH:mm
+  due?: string;
+  time?: string;
   subject?: string;
   kind: TaskKind;
   priority?: Priority;
   recur?: Recur;
   done: boolean;
-  doneAt?: string; // ISO
-  createdAt: string; // ISO
+  doneAt?: string;
+  createdAt: string;
 }
 
 export interface Note {
@@ -27,7 +28,6 @@ export interface Note {
   updatedAt: string;
 }
 
-/** Jadwal pelajaran: indeks 0 = Minggu … 6 = Sabtu; isinya daftar mapel berurutan. */
 export type Schedule = string[][];
 
 export type ThemeMode = 'auto' | 'light' | 'dark';
@@ -35,7 +35,6 @@ export type Accent = 'indigo' | 'green' | 'orange' | 'pink';
 
 export interface Settings {
   remindersOn: boolean;
-  /** jam pengingat untuk tugas yang hanya punya tanggal; '' = jangan ingatkan */
   defaultTime: string;
   dayBefore: boolean;
   dayBeforeTime: string;
@@ -48,7 +47,6 @@ export interface Settings {
 
 export interface DB {
   v: 1;
-  /** naik tiap penyimpanan; dipakai untuk memilih salinan terbaru */
   rev: number;
   tasks: Task[];
   notes: Note[];
@@ -56,6 +54,7 @@ export interface DB {
   settings: Settings;
 }
 
+// Defaults
 export const emptySchedule = (): Schedule => Array.from({ length: 7 }, () => [] as string[]);
 
 export const defaultSettings = (): Settings => ({
@@ -120,7 +119,7 @@ function coerceSchedule(x: unknown): Schedule {
   return out;
 }
 
-/** Terima data apa pun (berkas rusak, versi lama, cadangan) dan hasilkan DB yang valid. */
+// Migration
 export function migrate(raw: unknown): DB {
   const base = createDB();
   if (!raw || typeof raw !== 'object') return base;

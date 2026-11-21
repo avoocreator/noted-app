@@ -8,7 +8,6 @@ import { Icon } from '../ui/Icon.tsx';
 
 const byOpen = (a: Task, b: Task) => Number(a.done) - Number(b.done) || (a.time ?? '99').localeCompare(b.time ?? '99') || a.createdAt.localeCompare(b.createdAt);
 
-/** Ritual malam: apa yang harus dikumpul dan dibawa besok. */
 export function Bag() {
   const db = useStore((s) => s.db);
   const toggle = useStore((s) => s.toggleTask);

@@ -1,7 +1,9 @@
 import { migrate, type DB } from './model.ts';
 
+// Types
 export interface BackupFile { app: 'noted'; version: 1; exportedAt: string; data: DB }
 
+// Backup
 export function exportBackup(db: DB, now = new Date()): string {
   const f: BackupFile = { app: 'noted', version: 1, exportedAt: now.toISOString(), data: db };
   return JSON.stringify(f, null, 1);
@@ -18,14 +20,12 @@ export function parseBackup(text: string): BackupResult {
   return { ok: true, db: migrate(data) };
 }
 
-/** Hari sejak cadangan terakhir; null bila belum pernah. */
 export function daysSinceBackup(lastBackup: string | undefined, now = new Date()): number | null {
   if (!lastBackup) return null;
   const t = Date.parse(lastBackup);
   return Number.isNaN(t) ? null : Math.floor((now.getTime() - t) / 86_400_000);
 }
 
-/** Perlu diingatkan mencadangkan? Hanya bila ada isi yang berarti. */
 export function backupNudge(db: DB, now = new Date()): boolean {
   const meaningful = db.tasks.length + db.notes.length >= 3;
   if (!meaningful) return false;

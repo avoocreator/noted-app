@@ -2,6 +2,7 @@ import { addDays, atTime, startOfDay, ymd, DAYS_ID } from './dates.ts';
 import { bagBody, bagLong, buildBag } from './bag.ts';
 import type { DB, Task } from './model.ts';
 
+// Types
 export interface Planned {
   id: number;
   at: number;
@@ -9,11 +10,9 @@ export interface Planned {
   body: string;
   largeBody?: string;
   channel: 'noted-tugas' | 'noted-tas';
-  /** kunci stabil; dipakai untuk membandingkan rencana lama dan baru */
   key: string;
 }
 
-/** ID notifikasi (int32 positif) yang stabil dari sebuah kunci. */
 export function notifId(key: string): number {
   let h = 7;
   for (let i = 0; i < key.length; i++) h = (Math.imul(h, 31) + key.charCodeAt(i)) | 0;
@@ -25,10 +24,7 @@ const BAG_DAYS = 14;
 
 const subjectTag = (t: Task) => (t.subject ? `${t.subject} · ` : '');
 
-/**
- * Semua notifikasi yang harus dijadwalkan ke sistem, dari data sekarang.
- * Dipanggil ulang setiap data berubah: murni, tanpa efek samping.
- */
+// Planner
 export function planNotifications(db: DB, now: Date): Planned[] {
   const s = db.settings;
   if (!s.remindersOn) return [];
@@ -72,5 +68,4 @@ export function planNotifications(db: DB, now: Date): Planned[] {
   return out.sort((a, b) => a.at - b.at).slice(0, MAX);
 }
 
-/** Tanda tangan rencana: bila sama dengan yang terakhir diterapkan, tidak perlu menjadwalkan ulang. */
 export const planSignature = (p: Planned[]) => p.map((x) => `${x.id}@${x.at}|${x.title}|${x.body}|${x.largeBody ?? ''}`).join('\n');

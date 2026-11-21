@@ -2,24 +2,19 @@ import { DAYS_ID, ymd } from './dates.ts';
 import type { Schedule, Task } from './model.ts';
 import { subjectsOn } from './schedule.ts';
 
+// Types
 export interface Bag {
   date: string;
   dayName: string;
-  /** mapel pada hari itu (dari jadwal) */
   subjects: string[];
-  /** tugas yang harus dikumpul (jenis tugas/kumpul), belum selesai */
   kumpul: Task[];
-  /** barang yang harus dibawa, belum selesai */
   bawa: Task[];
-  /** jumlah item (kumpul+bawa) yang sudah dicentang untuk hari itu */
   doneCount: number;
-  /** tidak ada apa pun untuk disiapkan */
   empty: boolean;
-  /** semua sudah siap (ada item dan semuanya tercentang) */
   ready: boolean;
 }
 
-/** Isi "Tas Besok" untuk tanggal `forDate`. Item yang sudah dicentang tetap ikut dihitung untuk status "siap". */
+// Bag builder
 export function buildBag(tasks: Task[], schedule: Schedule, forDate: Date): Bag {
   const date = ymd(forDate);
   const due = tasks.filter((t) => t.due === date);
@@ -45,7 +40,7 @@ const byTime = (a: Task, b: Task) => (a.time ?? '99').localeCompare(b.time ?? '9
 
 const clip = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
 
-/** Teks ringkas untuk isi notifikasi. */
+// Formatting
 export function bagBody(b: Bag): string {
   const parts: string[] = [];
   if (b.subjects.length) parts.push(b.subjects.join(', '));
@@ -55,7 +50,6 @@ export function bagBody(b: Bag): string {
   return clip(parts.join(' · '), 160);
 }
 
-/** Teks lengkap (notifikasi yang dibuka / dibagikan). */
 export function bagLong(b: Bag): string {
   const lines: string[] = [];
   if (b.subjects.length) lines.push('Pelajaran: ' + b.subjects.join(', '));

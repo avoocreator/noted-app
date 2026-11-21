@@ -1,7 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { Icon } from './Icon.tsx';
 
-/** Lembar dari bawah (atau layar penuh). Menutup dengan ketuk latar, tombol ×, atau Esc. */
 export function Sheet({ title, onClose, children, full, actions }: { title: string; onClose: () => void; children: ReactNode; full?: boolean; actions?: ReactNode }) {
   useEffect(() => {
     const f = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

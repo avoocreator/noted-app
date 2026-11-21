@@ -1,4 +1,4 @@
-/* Noted — krem hangat, kartu pastel, tombol hitam berbentuk pil */
+/* Theme */
 :root {
   --bg: #f9f3e3; --surface: #efe8d8; --surface2: #e5dcc6; --card: #fffbf0;
   --text: #15140f; --muted: #6f6a5c; --line: #e0d7bf;
@@ -66,7 +66,7 @@ textarea { resize: vertical; }
 .panel h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
 .panel h3 i { font-style: normal; opacity: .6; margin-left: 4px; }
 
-/* kartu ringkasan pastel */
+/* Cards */
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .stat { position: relative; overflow: hidden; text-align: left; border-radius: 26px; padding: 16px; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between; color: var(--on-pastel); isolation: isolate; }
 .stat::after { content: ''; position: absolute; z-index: -1; right: -18px; top: -18px; width: 92px; height: 92px; background: rgba(0, 0, 0, .11); }

@@ -12,13 +12,12 @@ export type Tab = 'week' | 'bag' | 'notes' | 'settings';
 
 interface Toast { id: number; text: string; undo?: () => void }
 
+// State
 interface State {
   ready: boolean;
   db: DB;
   tab: Tab;
-  /** id catatan yang sedang dibuka, atau null */
   openNote: string | null;
-  /** id tugas yang sedang diedit, atau null */
   editTask: string | null;
   scheduleOpen: boolean;
   pasteOpen: boolean;
@@ -54,6 +53,7 @@ interface State {
 
 let toastId = 1;
 
+// Store
 export const useStore = create<State>((set, get) => {
   const mutate = (f: (db: DB) => DB) => set((s) => ({ db: f(s.db) }));
   return {
@@ -130,7 +130,7 @@ export const useStore = create<State>((set, get) => {
   };
 });
 
-/* ── penyimpanan otomatis + penjadwalan notifikasi ─────────────────────────────────────── */
+// Auto-save
 let saveTimer: number | undefined;
 let planTimer: number | undefined;
 
@@ -144,7 +144,7 @@ function replan(force = false) {
   planTimer = window.setTimeout(() => void applyPlan(planNotifications(useStore.getState().db, new Date()), force), force ? 0 : 1200);
 }
 
-/** Dipanggil sekali saat aplikasi mulai. */
+// Bootstrap
 export async function bootstrap(): Promise<void> {
   await useStore.getState().init();
   let prev = useStore.getState().db;
@@ -156,7 +156,6 @@ export async function bootstrap(): Promise<void> {
     saveTimer = window.setTimeout(flush, 400);
     if (tasksOrPlan) replan();
   });
-  // simpan segera bila aplikasi masuk latar belakang; jadwalkan ulang saat dibuka lagi (jendela Tas Besok bergeser)
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') { if (saveTimer !== undefined) flush(); }
     else replan();

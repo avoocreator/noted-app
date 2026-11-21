@@ -3,6 +3,7 @@ import type { Priority, Recur, Schedule, TaskKind } from './model.ts';
 import { nextMeeting } from './schedule.ts';
 import { canonicalSubject, findSubjectInText } from './subjects.ts';
 
+// Types
 export interface Parsed {
   title: string;
   due?: string;
@@ -11,17 +12,16 @@ export interface Parsed {
   kind: TaskKind;
   priority?: Priority;
   recur?: Recur;
-  /** teks menyebut "pertemuan berikutnya" */
   meeting?: boolean;
 }
 
 export interface ParseCtx {
   now?: Date;
   schedule?: Schedule;
-  /** mapel yang sudah dikenal (jadwal + tugas sebelumnya) */
   subjects?: string[];
 }
 
+// Constants
 const MONTHS: Record<string, number> = {
   jan: 0, januari: 0, feb: 1, februari: 1, mar: 2, maret: 2, apr: 3, april: 3, mei: 4, jun: 5, juni: 5,
   jul: 6, juli: 6, agu: 7, agt: 7, agustus: 7, sep: 8, sept: 8, september: 8, okt: 9, oktober: 9, nov: 10, november: 10, des: 11, desember: 11,
@@ -40,10 +40,7 @@ function take(src: string, re: RegExp): { rest: string; m: RegExpExecArray | nul
 const TRAILING = /(?:\s+(?:dikumpul(?:kan)?|kumpul(?:kan)?|deadline|tenggat|paling\s+lambat|pada|hari|sampai|s\/d|sd|untuk|di|pd|tgl|tanggal|jam|pukul|pkl|yaitu|ya))+$/i;
 const LEADING = /^(?:hari|pada|untuk)\s+/i;
 
-/**
- * Pahami kalimat bebas bahasa Indonesia:
- * "PR matematika hal 45 dikumpul jumat jam 7 !penting" → judul, tenggat, jam, mapel, jenis (tugas/kumpul/bawa).
- */
+// Parser
 export function parseTask(input: string, ctx: ParseCtx = {}): Parsed {
   const now = ctx.now ?? new Date();
   const today = startOfDay(now);
@@ -53,13 +50,11 @@ export function parseTask(input: string, ctx: ParseCtx = {}): Parsed {
 
   out.kind = SUBMIT.test(input) ? 'kumpul' : BRING.test(input) ? 'bawa' : 'tugas';
 
-  // prioritas
   let r = take(s, /\s!(penting|tinggi|high|p1|urgent)\b/i);
   if (r.m) { out.priority = 'high'; s = r.rest; }
   else if ((r = take(s, /\s!(sedang|medium|p2)\b/i)).m) { out.priority = 'medium'; s = r.rest; }
   else if ((r = take(s, /\s!(rendah|low|p3)\b/i)).m) { out.priority = 'low'; s = r.rest; }
 
-  // pengulangan
   r = take(s, /\s(?:tiap|setiap)\s+(hari|minggu|pekan|bulan)\b/i);
   if (r.m) {
     const w = r.m[1].toLowerCase();
@@ -67,12 +62,10 @@ export function parseTask(input: string, ctx: ParseCtx = {}): Parsed {
     s = r.rest;
   }
 
-  // mapel lewat #tag
   r = take(s, /\s#([\p{L}\p{N}_-]+)/u);
   let tagSubject: string | undefined;
   if (r.m) { tagSubject = canonicalSubject(r.m[1].replace(/_/g, ' '), known); s = r.rest; }
 
-  // jam
   r = take(s, /\s(?:jam|pukul|pkl)\s*(\d{1,2})(?:[:.](\d{2}))?\s*(pagi|siang|sore|malam)?\b/i);
   if (!r.m) r = take(s, /\s(\d{1,2}):(\d{2})\s*(pagi|siang|sore|malam)?(?=\s)/i);
   if (r.m) {
@@ -83,7 +76,6 @@ export function parseTask(input: string, ctx: ParseCtx = {}): Parsed {
     if (h <= 23 && mi <= 59) { out.time = `${pad(h)}:${pad(mi)}`; s = r.rest; }
   }
 
-  // tanggal
   let due = undefined as Date | undefined;
   const set = (d: Date, rest: string) => { due = d; s = rest; };
   if ((r = take(s, /\s(\d{4}-\d{2}-\d{2})(?=\s)/)).m) { const d = parseYmd(r.m![1]); if (d) set(d, r.rest); }
@@ -121,12 +113,10 @@ export function parseTask(input: string, ctx: ParseCtx = {}): Parsed {
   if (!due && (r = take(s, /\s(?:hari\s+)?(senin|selasa|rabu|kamis|jum'?at|sabtu|ahad|minggu(?!\s+(?:ini|depan|lalu|kemarin)\b))(\s+depan)?\b/i)).m) {
     const wd = WEEKDAYS[r.m![1].toLowerCase().replace("'", '')];
     if (r.m![2]) {
-      // "Jumat depan" = Jumat di pekan (Senin–Minggu) berikutnya
       set(addDays(nextWeekday(today, 1), (wd + 6) % 7), r.rest);
     } else set(nextWeekday(today, wd), r.rest);
   }
 
-  // "pertemuan berikutnya" → tanggal pelajaran itu berikutnya (butuh mapel + jadwal)
   r = take(s, /\s(?:pada\s+)?(?:pertemuan|pelajaran)\s+(?:yang\s+)?(?:berikutnya|selanjutnya|depan|akan\s+datang)\b/i);
   if (r.m) { out.meeting = true; s = r.rest; }
 

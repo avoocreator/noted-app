@@ -2,9 +2,11 @@ import { addDays, ymd } from './dates.ts';
 import type { Task } from './model.ts';
 import { sameSubject } from './subjects.ts';
 
+// Types
 export type GroupId = 'overdue' | 'today' | 'tomorrow' | 'week' | 'later' | 'nodate';
 export interface Group { id: GroupId; label: string; items: Task[] }
 
+// Grouping
 const ORDER: { id: GroupId; label: string }[] = [
   { id: 'overdue', label: 'Terlambat' },
   { id: 'today', label: 'Hari ini' },
@@ -28,7 +30,6 @@ export function compareTasks(a: Task, b: Task): number {
   return (a.due ?? '9').localeCompare(b.due ?? '9') || (a.time ?? '99').localeCompare(b.time ?? '99') || PRI[a.priority ?? 'low'] - PRI[b.priority ?? 'low'] || a.createdAt.localeCompare(b.createdAt);
 }
 
-/** Tugas yang belum selesai, dikelompokkan untuk layar "Minggu ini". */
 export function groupTasks(tasks: Task[], now: Date, subject?: string | null): Group[] {
   const by = new Map<GroupId, Task[]>();
   for (const t of tasks) {
@@ -40,7 +41,6 @@ export function groupTasks(tasks: Task[], now: Date, subject?: string | null): G
   return ORDER.map((o) => ({ ...o, items: (by.get(o.id) ?? []).sort(compareTasks) })).filter((g) => g.items.length > 0);
 }
 
-/** Mapel yang dipakai tugas aktif, urut dari yang paling sering. */
 export function subjectCounts(tasks: Task[]): [string, number][] {
   const m = new Map<string, number>();
   for (const t of tasks) if (!t.done && t.subject) m.set(t.subject, (m.get(t.subject) ?? 0) + 1);

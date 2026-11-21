@@ -5,7 +5,6 @@ import { useStore } from '../data/store.ts';
 import { Sheet } from '../ui/Sheet.tsx';
 import { Icon } from '../ui/Icon.tsx';
 
-/** Ubah satu tugas. Perubahan disimpan saat menekan Simpan. */
 export function TaskSheet({ id }: { id: string }) {
   const task = useStore((s) => s.db.tasks.find((t) => t.id === id));
   const schedule = useStore((s) => s.db.schedule);

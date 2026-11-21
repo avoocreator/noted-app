@@ -1,5 +1,6 @@
 import { emptySchedule, type Schedule } from './model.ts';
 
+// Codec
 const PREFIX = 'NOTED1-';
 
 function toB64Url(text: string): string {
@@ -17,12 +18,10 @@ function fromB64Url(s: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-/** Jadwal → kode teks pendek yang bisa dibagikan lewat WhatsApp. Tanpa server. */
 export function encodeSchedule(s: Schedule): string {
   return PREFIX + toB64Url(JSON.stringify(s.slice(0, 7)));
 }
 
-/** Kode (atau pesan yang memuat kode) → jadwal, atau null bila tidak valid. */
 export function decodeSchedule(input: string): Schedule | null {
   const m = /NOTED1-([A-Za-z0-9_-]+)/.exec(input);
   if (!m) return null;
@@ -42,5 +41,5 @@ export function decodeSchedule(input: string): Schedule | null {
   } catch { return null; }
 }
 
-/** Pesan siap kirim berisi kode jadwal. */
+// Share message
 export const classMessage = (s: Schedule) => `Jadwal pelajaran kelas kita di Noted. Salin pesan ini lalu pilih "Impor dari kode kelas" di aplikasi:\n\n${encodeSchedule(s)}`;

@@ -4,7 +4,7 @@ import { Share } from '@capacitor/share';
 
 export type ShareResult = 'shared' | 'copied' | 'cancelled';
 
-/** Bagikan teks (kode kelas). Android: lembar berbagi; lainnya: salin ke papan klip. */
+// Share text
 export async function shareText(text: string, title = 'Noted'): Promise<ShareResult> {
   try {
     if (Capacitor.isNativePlatform()) { await Share.share({ title, text, dialogTitle: title }); return 'shared'; }
@@ -14,7 +14,7 @@ export async function shareText(text: string, title = 'Noted'): Promise<ShareRes
   try { await navigator.clipboard.writeText(text); return 'copied'; } catch { return 'cancelled'; }
 }
 
-/** Simpan/bagikan berkas cadangan. Android: lewat lembar berbagi (simpan ke Drive, kirim ke WA, dst.). Web: unduh. */
+// Backup export
 export async function saveBackupFile(text: string, filename: string): Promise<boolean> {
   try {
     if (Capacitor.isNativePlatform()) {

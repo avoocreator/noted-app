@@ -10,7 +10,6 @@ import { TaskRow } from '../ui/TaskRow.tsx';
 
 const NODATE_LIMIT = 5;
 
-/** Layar awal: tugas yang perlu dikerjakan, urut tenggat. */
 export function Week() {
   const db = useStore((s) => s.db);
   const setPasteOpen = useStore((s) => s.setPasteOpen);
