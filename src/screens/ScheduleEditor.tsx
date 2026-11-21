@@ -3,11 +3,14 @@ import { DAYS_ID } from '../lib/dates.ts';
 import { classMessage, decodeSchedule, encodeSchedule } from '../lib/classcode.ts';
 import { copyDay, hasSchedule, knownSubjects, SCHOOL_DAYS, setDay } from '../lib/schedule.ts';
 import { COMMON_SUBJECTS, displaySubject, sameSubject } from '../lib/subjects.ts';
+import { type Schedule } from '../lib/model.ts';
 import { shareText } from '../data/share.ts';
 import { useStore } from '../data/store.ts';
 import { Icon } from '../ui/Icon.tsx';
 import { Sheet } from '../ui/Sheet.tsx';
 import { QrModal } from '../ui/QrModal.tsx';
+import { ScannerModal } from '../ui/ScannerModal.tsx';
+import { SchedulePreviewModal } from '../ui/SchedulePreviewModal.tsx';
 
 /** Isi jadwal pelajaran per hari. Tanpa jam: yang dibutuhkan hanya hari dan daftar mapel. */
 export function ScheduleEditor() {
@@ -20,6 +23,8 @@ export function ScheduleEditor() {
   const [text, setText] = useState('');
   const [code, setCode] = useState('');
   const [showQr, setShowQr] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [pendingSchedule, setPendingSchedule] = useState<Schedule | null>(null);
 
   const list = schedule[day] ?? [];
   const put = (l: string[]) => setSchedule(setDay(schedule, day, l));
@@ -46,10 +51,18 @@ export function ScheduleEditor() {
   };
   const importCode = () => {
     const s = decodeSchedule(code);
-    if (!s) { toast('Kode tidak dikenali'); return; }
-    if (hasSchedule(schedule) && !window.confirm('Ganti jadwalmu dengan jadwal dari kode ini?')) return;
-    setSchedule(s); setCode('');
-    toast('Jadwal diimpor');
+    if (!s) { toast('Kode tidak dikenali (harus diawali NOTED1-)'); return; }
+    setPendingSchedule(s);
+    setCode('');
+  };
+  const handleScannedCode = (raw: string) => {
+    setShowScanner(false);
+    const s = decodeSchedule(raw);
+    if (!s) {
+      toast('Bukan kode jadwal Noted yang valid (harus diawali NOTED1-)');
+      return;
+    }
+    setPendingSchedule(s);
   };
 
   return (
@@ -103,12 +116,28 @@ export function ScheduleEditor() {
           if (!hasSchedule(schedule)) { toast('Isi jadwal dulu'); return; }
           setShowQr(true);
         }}><Icon name="qr" size={18} /> Tampilkan QR</button>
+        <button className="btn soft" onClick={() => setShowScanner(true)}>
+          <Icon name="camera" size={18} /> Pindai QR
+        </button>
       </div>
 
       <h3 className="sub">Impor dari kode kelas</h3>
       <textarea className="paste-area" rows={3} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Tempel pesan atau kode NOTED1-… dari temanmu" aria-label="Kode kelas" />
       <button className="btn soft" disabled={!code.trim()} onClick={importCode}>Impor jadwal</button>
       {showQr && <QrModal title="QR Jadwal Kelas" code={encodeSchedule(schedule)} onClose={() => setShowQr(false)} />}
+      {showScanner && <ScannerModal title="Pindai QR Jadwal" onClose={() => setShowScanner(false)} onScan={handleScannedCode} />}
+      {pendingSchedule && (
+        <SchedulePreviewModal
+          newSchedule={pendingSchedule}
+          currentSchedule={schedule}
+          onConfirm={() => {
+            setSchedule(pendingSchedule);
+            setPendingSchedule(null);
+            toast('Jadwal berhasil diimpor');
+          }}
+          onClose={() => setPendingSchedule(null)}
+        />
+      )}
     </Sheet>
   );
 }

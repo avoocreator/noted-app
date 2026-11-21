@@ -31,7 +31,7 @@ export interface ScannerModalProps {
 
 type ScannerStatus = 'starting' | 'scanning' | 'unsupported' | 'denied' | 'error';
 
-/** Modal pemindai kamera untuk memindai QR code jadwal kelas */
+/** Modal pemindai kamera & galeri untuk memindai QR code jadwal kelas */
 export function ScannerModal({
   title = 'Pindai QR Jadwal',
   onClose,
@@ -44,6 +44,7 @@ export function ScannerModal({
   const streamRef = useRef<MediaStream | null>(null);
   const activeRef = useRef<boolean>(true);
   const timerRef = useRef<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const stopCamera = () => {
     activeRef.current = false;
@@ -188,6 +189,71 @@ export function ScannerModal({
     };
   }, [onClose, onScan]);
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+
+    if (typeof window === 'undefined' || !window.BarcodeDetector) {
+      setStatus('unsupported');
+      setErrorMsg('Peramban ini belum mendukung BarcodeDetector API untuk membaca berkas gambar.');
+      return;
+    }
+
+    try {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Gagal memuat berkas gambar'));
+        img.src = url;
+      });
+      URL.revokeObjectURL(url);
+
+      const maxDim = 1280;
+      let w = img.naturalWidth || img.width;
+      let h = img.naturalHeight || img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        } else {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Gagal inisialisasi decoder canvas');
+      ctx.drawImage(img, 0, 0, w, h);
+
+      let detector: IBarcodeDetector;
+      try {
+        detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      } catch {
+        detector = new window.BarcodeDetector();
+      }
+
+      const barcodes = await detector.detect(canvas);
+      if (barcodes.length > 0) {
+        const raw = barcodes[0].rawValue?.trim();
+        if (raw) {
+          stopCamera();
+          onScan(raw);
+          return;
+        }
+      }
+      setErrorMsg('Tidak ditemukan QR code pada gambar yang dipilih.');
+      setStatus('error');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Gagal membaca berkas gambar.');
+      setStatus('error');
+    }
+  };
+
   return (
     <div className="modal-wrap" role="dialog" aria-modal="true" aria-label={title}>
       <div className="scrim" onClick={onClose} />
@@ -231,14 +297,29 @@ export function ScannerModal({
                 ? 'Peramban Tidak Mendukung'
                 : status === 'denied'
                   ? 'Izin Kamera Dibutuhkan'
-                  : 'Gagal Membuka Kamera'}
+                  : 'Pemberitahuan Pemindai'}
             </p>
             <p className="small muted">{errorMsg}</p>
           </div>
         )}
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+        />
+
         <div className="row wrap gap center" style={{ width: '100%', justifyContent: 'center' }}>
-          <button className="btn soft" onClick={onClose}>
+          <button
+            type="button"
+            className="btn soft"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Icon name="upload" size={18} /> Pilih gambar dari galeri
+          </button>
+          <button className="btn" onClick={onClose}>
             Tutup
           </button>
         </div>

@@ -8,7 +8,7 @@ import {
   QrCode,
   QrEcc,
 } from '../src/lib/qr.ts';
-import { encodeSchedule } from '../src/lib/classcode.ts';
+import { decodeSchedule, encodeSchedule } from '../src/lib/classcode.ts';
 import { emptySchedule } from '../src/lib/model.ts';
 import { setDay } from '../src/lib/schedule.ts';
 
@@ -129,4 +129,31 @@ test('qr: level error correction (L, M, Q, H)', () => {
   assert.equal(qr.errorCorrectionLevel, QrEcc.HIGH);
   assert.ok(qr.size >= 21);
   assert.equal(typeof qr.getModule(0, 0), 'boolean');
+});
+
+test('qr: validasi payload NOTED1-... dan pratinjau jadwal baru', () => {
+  // 1. Validasi penolakan payload bukan Noted
+  assert.equal(decodeSchedule('https://example.com/noted'), null);
+  assert.equal(decodeSchedule('WIFI:S:MyWifi;T:WPA;P:secret;;'), null);
+  assert.equal(decodeSchedule('RANDOM-CODE-12345'), null);
+  assert.equal(decodeSchedule('NOTED2-ABCDEF'), null);
+  assert.equal(decodeSchedule(''), null);
+
+  // 2. Validasi payload sah Noted
+  let s = emptySchedule();
+  s = setDay(s, 1, ['MTK', 'BIN']);
+  s = setDay(s, 2, ['BIG', 'FIS', 'KIM']);
+  const code = encodeSchedule(s);
+  assert.ok(code.startsWith('NOTED1-'));
+
+  const decoded = decodeSchedule(code);
+  assert.notEqual(decoded, null);
+  assert.deepEqual(decoded, s);
+
+  // 3. Perhitungan jumlah mapel untuk dialog pratinjau jadwal
+  const total = [1, 2, 3, 4, 5, 6].reduce((sum, d) => sum + (decoded![d]?.length ?? 0), 0);
+  assert.equal(total, 5);
+  assert.equal(decoded![1].length, 2);
+  assert.equal(decoded![2].length, 3);
+  assert.equal(decoded![3].length, 0);
 });
