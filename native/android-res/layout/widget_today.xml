@@ -63,65 +63,160 @@
             android:layout_marginTop="8dp"
             android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
                 android:id="@+id/row1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:textColor="#15140F"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:id="@+id/check1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="44dp"
+                    android:minHeight="44dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="#15140F"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/text1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="#15140F"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/row2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:textColor="#15140F"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:id="@+id/check2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="44dp"
+                    android:minHeight="44dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="#15140F"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/text2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="#15140F"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/row3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:textColor="#15140F"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:id="@+id/check3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="44dp"
+                    android:minHeight="44dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="#15140F"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/text3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="#15140F"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/row4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:textColor="#15140F"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-            <TextView
+                <TextView
+                    android:id="@+id/check4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="44dp"
+                    android:minHeight="44dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="#15140F"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/text4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="#15140F"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/row5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingTop="3dp"
-                android:paddingBottom="3dp"
-                android:textColor="#15140F"
-                android:textSize="14sp"
-                android:visibility="gone" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/check5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="44dp"
+                    android:minHeight="44dp"
+                    android:gravity="center_vertical|start"
+                    android:textColor="#15140F"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/text5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:textColor="#15140F"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/empty"

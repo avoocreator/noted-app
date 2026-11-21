@@ -65,6 +65,18 @@ const receiver = (cls, label, info) => `
         </receiver>
 `;
 if (!m.includes('.BagWidget')) m = m.replace('</application>', `${receiver('BagWidget', 'widget_bag_name', 'noted_bag_widget_info')}${receiver('TodayWidget', 'widget_today_name', 'noted_today_widget_info')}    </application>`);
+
+// receiver untuk aksi centang tugas dari widget
+const actionReceiver = `
+        <receiver android:name=".WidgetActionReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="app.noted.mobile.ACTION_TOGGLE_TASK" />
+            </intent-filter>
+        </receiver>
+`;
+if (!m.includes('.WidgetActionReceiver')) {
+  m = m.replace('</application>', `${actionReceiver}    </application>`);
+}
 writeFileSync(manPath, m);
 
 // kode native widget + plugin Capacitor
