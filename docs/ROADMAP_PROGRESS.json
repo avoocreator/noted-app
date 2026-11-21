@@ -1,14 +1,14 @@
 {
-  "current_phase": 6,
+  "current_phase": 7,
   "total_phases": 11,
-  "last_updated": "2026-11-21T16:31:00+07:00",
+  "last_updated": "2026-11-21T17:53:00+07:00",
   "phases": [
     { "id": 1, "name": "Android Intent Filter & Manifest", "status": "completed", "commit": "feat(android): add SEND intent filter for WhatsApp text sharing" },
     { "id": 2, "name": "Native Capacitor Bridge untuk Intent", "status": "completed", "commit": "feat(android): add native bridge to receive shared text from intent" },
     { "id": 3, "name": "Auto-Fill & Parsing di PasteSheet", "status": "completed", "commit": "feat(ui): auto-fill and parse incoming shared WhatsApp text in PasteSheet" },
     { "id": 4, "name": "Modul Generator QR Code SVG Lokal", "status": "completed", "commit": "feat(qr): add lightweight client-side QR code SVG generator" },
     { "id": 5, "name": "Modal Tampilan QR di Jadwal", "status": "completed", "commit": "feat(ui): add QR code display modal in ScheduleEditor" },
-    { "id": 6, "name": "Scanner Kamera via Native BarcodeDetector API", "status": "pending", "commit": "feat(qr): implement camera QR scanner using BarcodeDetector API" },
+    { "id": 6, "name": "Scanner Kamera via Native BarcodeDetector API", "status": "completed", "commit": "feat(qr): implement camera QR scanner using BarcodeDetector API" },
     { "id": 7, "name": "Fallback Scan Galeri & Konfirmasi Jadwal", "status": "pending", "commit": "feat(ui): add gallery scan fallback and schedule replacement preview" },
     { "id": 8, "name": "Mesin Tulis Dua-Slot JSON Atomik di Java", "status": "pending", "commit": "feat(android): implement atomic two-slot JSON task toggling in native Java" },
     { "id": 9, "name": "BroadcastReceiver & Split Touch Target Widget", "status": "pending", "commit": "feat(android): add WidgetActionReceiver and split touch targets in widget layouts" },
