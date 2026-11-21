@@ -687,10 +687,6 @@ export function parseEcc(ecc?: EccLevel): QrEcc {
   }
 }
 
-/**
- * Meng-encode teks/payload menjadi matriks 2D boolean.
- * matrix[y][x] bernilai true untuk modul gelap dan false untuk modul terang.
- */
 export function encodeQrMatrix(payload: string, ecc: EccLevel = 'M'): boolean[][] {
   const qr = QrCode.encodeText(payload, parseEcc(ecc));
   const matrix: boolean[][] = [];
@@ -706,10 +702,6 @@ export function encodeQrMatrix(payload: string, ecc: EccLevel = 'M'): boolean[][
 
 export const generateQrMatrix = encodeQrMatrix;
 
-/**
- * Meng-encode payload string menjadi SVG string siap pakai
- * dengan styling warna retro Noted: modul kotak --ink (#111111) berlatar --card (#fffbf0).
- */
 export function encodeQrSvg(payload: string, options: QrSvgOptions = {}): string {
   const ecc = options.ecc ?? 'M';
   const qr = QrCode.encodeText(payload, parseEcc(ecc));

@@ -31,7 +31,6 @@ export interface ScannerModalProps {
 
 type ScannerStatus = 'starting' | 'scanning' | 'unsupported' | 'denied' | 'error';
 
-/** Modal pemindai kamera & galeri untuk memindai QR code jadwal kelas */
 export function ScannerModal({
   title = 'Pindai QR Jadwal',
   onClose,
@@ -57,7 +56,7 @@ export function ScannerModal({
         try {
           track.stop();
         } catch {
-          // ignore error stopping track
+          // ignore
         }
       }
       streamRef.current = null;
@@ -118,7 +117,6 @@ export function ScannerModal({
         if (mounted) {
           setStatus('scanning');
 
-          // Inisialisasi loop deteksi BarcodeDetector
           let detector: IBarcodeDetector;
           try {
             detector = new window.BarcodeDetector!({ formats: ['qr_code'] });
@@ -140,7 +138,7 @@ export function ScannerModal({
                       try {
                         navigator.vibrate(40);
                       } catch {
-                        // ignore vibrate failure
+                        // ignore
                       }
                     }
                     stopCamera();
@@ -149,7 +147,7 @@ export function ScannerModal({
                   }
                 }
               } catch {
-                // Lewati frame bila pembacaan belum siap
+                // ignore frame read error
               }
             }
             if (activeRef.current) {

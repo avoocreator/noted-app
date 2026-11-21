@@ -20,7 +20,6 @@ test('qr: matriks QR code dan finder patterns valid', () => {
 
   const size = matrix.length;
 
-  // Verifikasi 3 finder pattern (7x7) di sudut kiri-atas, kanan-atas, dan kiri-bawah
   const checkFinder = (r0: number, c0: number) => {
     for (let r = 0; r < 7; r++) {
       for (let c = 0; c < 7; c++) {
@@ -35,46 +34,35 @@ test('qr: matriks QR code dan finder patterns valid', () => {
     }
   };
 
-  checkFinder(0, 0); // Kiri-atas
-  checkFinder(0, size - 7); // Kanan-atas
-  checkFinder(size - 7, 0); // Kiri-bawah
+  checkFinder(0, 0);
+  checkFinder(0, size - 7);
+  checkFinder(size - 7, 0);
 
-  // Verifikasi timing pattern baris 6 dan kolom 6 (bergantian modul gelap dan terang)
   for (let i = 8; i < size - 8; i++) {
     const expected = i % 2 === 0;
-    assert.equal(matrix[6][i], expected, `Horizontal timing pattern mismatch at col ${i}`);
-    assert.equal(matrix[i][6], expected, `Vertical timing pattern mismatch at row ${i}`);
+    assert.equal(matrix[6][i], expected);
+    assert.equal(matrix[i][6], expected);
   }
 
-  // Alias generateQrMatrix berfungsi identik
-  const aliasMatrix = generateQrMatrix('NOTED1-TEST');
-  assert.deepEqual(aliasMatrix, matrix);
+  assert.deepEqual(generateQrMatrix('NOTED1-TEST'), matrix);
 });
 
 test('qr: styling SVG Noted retro (--ink dan --card)', () => {
   const svg = encodeQrSvg('NOTED1-TEST');
 
-  // Struktur SVG valid
   assert.ok(svg.startsWith('<svg'));
   assert.ok(svg.trim().endsWith('</svg>'));
   assert.ok(svg.includes('shape-rendering="crispEdges"'));
-
-  // Warna retro Noted: modul kotak --ink (#111111) berlatar --card (#fffbf0)
   assert.ok(svg.includes('var(--card, #fffbf0)'));
   assert.ok(svg.includes('var(--ink, #111111)'));
   assert.ok(svg.includes('--card'));
   assert.ok(svg.includes('#fffbf0'));
   assert.ok(svg.includes('--ink'));
   assert.ok(svg.includes('#111111'));
-
-  // Quiet zone default 4 modul: ukuran matriks 21 + (4 * 2) = 29
   assert.ok(svg.includes('viewBox="0 0 29 29"'));
   assert.ok(svg.includes('<rect width="29" height="29"'));
-
-  // Modul digambar dengan path ringkas dan presisi
   assert.ok(svg.includes('<path d="M'));
 
-  // Uji opsi kustom: border, size, warna, dan modul format rect
   const customSvg = encodeQrSvg('NOTED1-TEST', {
     border: 2,
     size: 240,
@@ -88,10 +76,7 @@ test('qr: styling SVG Noted retro (--ink dan --card)', () => {
   assert.ok(customSvg.includes('fill="#abcdef"'));
   assert.ok(customSvg.includes('fill="#123456"'));
   assert.ok(customSvg.includes('<rect x="'));
-
-  // Alias generateQrSvg berfungsi identik
-  const aliasSvg = generateQrSvg('NOTED1-TEST');
-  assert.equal(aliasSvg, svg);
+  assert.equal(generateQrSvg('NOTED1-TEST'), svg);
 });
 
 test('qr: integrasi dengan payload jadwal classcode NOTED1-...', () => {
@@ -106,7 +91,7 @@ test('qr: integrasi dengan payload jadwal classcode NOTED1-...', () => {
   assert.ok(payload.startsWith('NOTED1-'));
 
   const matrix = encodeQrMatrix(payload);
-  assert.ok(matrix.length > 21, 'Matriks payload jadwal harus lebih besar dari versi 1');
+  assert.ok(matrix.length > 21);
 
   const svg = encodeQrSvg(payload);
   assert.ok(svg.startsWith('<svg'));
@@ -124,7 +109,6 @@ test('qr: level error correction (L, M, Q, H)', () => {
     assert.ok(svg.includes('<svg'));
   }
 
-  // Objek QrCode tingkat rendah
   const qr = QrCode.encodeText('NOTED1-TEST', QrEcc.HIGH);
   assert.equal(qr.errorCorrectionLevel, QrEcc.HIGH);
   assert.ok(qr.size >= 21);
@@ -132,14 +116,12 @@ test('qr: level error correction (L, M, Q, H)', () => {
 });
 
 test('qr: validasi payload NOTED1-... dan pratinjau jadwal baru', () => {
-  // 1. Validasi penolakan payload bukan Noted
   assert.equal(decodeSchedule('https://example.com/noted'), null);
   assert.equal(decodeSchedule('WIFI:S:MyWifi;T:WPA;P:secret;;'), null);
   assert.equal(decodeSchedule('RANDOM-CODE-12345'), null);
   assert.equal(decodeSchedule('NOTED2-ABCDEF'), null);
   assert.equal(decodeSchedule(''), null);
 
-  // 2. Validasi payload sah Noted
   let s = emptySchedule();
   s = setDay(s, 1, ['MTK', 'BIN']);
   s = setDay(s, 2, ['BIG', 'FIS', 'KIM']);
@@ -150,7 +132,6 @@ test('qr: validasi payload NOTED1-... dan pratinjau jadwal baru', () => {
   assert.notEqual(decoded, null);
   assert.deepEqual(decoded, s);
 
-  // 3. Perhitungan jumlah mapel untuk dialog pratinjau jadwal
   const total = [1, 2, 3, 4, 5, 6].reduce((sum, d) => sum + (decoded![d]?.length ?? 0), 0);
   assert.equal(total, 5);
   assert.equal(decoded![1].length, 2);

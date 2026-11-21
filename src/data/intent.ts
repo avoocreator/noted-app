@@ -28,10 +28,6 @@ function shouldHandle(text: string): boolean {
   return true;
 }
 
-/**
- * Membaca teks kiriman yang tertunda dari intent native (cold start).
- * Mengembalikan string jika ada teks masuk, atau null jika tidak ada.
- */
 export async function getPendingSharedText(): Promise<string | null> {
   if (!Capacitor.isNativePlatform()) return null;
   try {
@@ -46,10 +42,6 @@ export async function getPendingSharedText(): Promise<string | null> {
   }
 }
 
-/**
- * Mendengarkan kiriman teks saat aplikasi sedang berjalan (warm start).
- * Mengembalikan fungsi cleanup untuk mencabut listener.
- */
 export async function listenSharedText(handler: (text: string) => void): Promise<() => void> {
   if (!Capacitor.isNativePlatform()) return () => {};
   try {
@@ -67,11 +59,6 @@ export async function listenSharedText(handler: (text: string) => void): Promise
   }
 }
 
-/**
- * Inisialisasi pendengar teks kiriman (share intent).
- * Mengambil teks tertunda saat aplikasi dibuka (cold start),
- * dan mendengarkan kiriman teks saat aplikasi sedang berjalan (warm start).
- */
 export async function initIntentListener(onReceived: (text: string) => void): Promise<() => void> {
   const cleanupPromise = listenSharedText(onReceived);
   const pending = await getPendingSharedText();

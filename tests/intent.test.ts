@@ -22,12 +22,10 @@ test('intent: fallback aman di lingkungan non-native', async () => {
 });
 
 test('intent & store: incomingText dan pasteOpen sinkron saat teks dibagikan', () => {
-  // Simulasi penerimaan teks dari intent
   useStore.setState({ incomingText: 'PR Fisika hal 20 dikumpul Jumat', pasteOpen: true });
   assert.equal(useStore.getState().incomingText, 'PR Fisika hal 20 dikumpul Jumat');
   assert.equal(useStore.getState().pasteOpen, true);
 
-  // Saat sheet ditutup, incomingText otomatis dibersihkan
   useStore.getState().setPasteOpen(false);
   assert.equal(useStore.getState().pasteOpen, false);
   assert.equal(useStore.getState().incomingText, null);

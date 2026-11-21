@@ -43,7 +43,6 @@ export function PasteSheet() {
     return true;
   }, [db.schedule, known, findDuplicate]);
 
-  // Otomatis jalankan parsing bila ada teks masuk dari WhatsApp/intent
   useEffect(() => {
     if (incomingText && incomingText.trim() && lastIncomingRef.current !== incomingText) {
       lastIncomingRef.current = incomingText;

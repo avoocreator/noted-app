@@ -11,7 +11,6 @@ export interface SchedulePreviewModalProps {
   onClose: () => void;
 }
 
-/** Modal dialog pratinjau jadwal baru sebelum jadwal lama ditimpa */
 export function SchedulePreviewModal({
   newSchedule,
   currentSchedule,
