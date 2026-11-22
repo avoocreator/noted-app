@@ -124,44 +124,57 @@ export const useStore = create<State>((set, get) => {
     toast: (text, undo) => {
       const id = toastId++;
       set((s) => ({ toasts: [...s.toasts, { id, text, undo }] }));
-      window.setTimeout(() => get().dismissToast(id), undo ? 6000 : 2800);
+      setTimeout(() => get().dismissToast(id), undo ? 6000 : 2800);
     },
     dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
   };
 });
 
 // Auto-save
-let saveTimer: number | undefined;
-let planTimer: number | undefined;
+let saveTimer: ReturnType<typeof setTimeout> | number | undefined;
+let planTimer: ReturnType<typeof setTimeout> | number | undefined;
+let prevDB: DB | null = null;
 
 function flush() {
-  window.clearTimeout(saveTimer);
+  clearTimeout(saveTimer);
   saveTimer = undefined;
   void saveDB(useStore.getState().db).then(() => { useStore.setState({ lastSaved: Date.now() }); void refreshWidgets(); });
 }
 function replan(force = false) {
-  window.clearTimeout(planTimer);
-  planTimer = window.setTimeout(() => void applyPlan(planNotifications(useStore.getState().db, new Date()), force), force ? 0 : 1200);
+  clearTimeout(planTimer);
+  planTimer = setTimeout(() => void applyPlan(planNotifications(useStore.getState().db, new Date()), force), force ? 0 : 1200);
+}
+
+export async function syncFromDisk(): Promise<boolean> {
+  const disk = await loadDB();
+  const current = useStore.getState().db;
+  if (disk.rev <= current.rev) return false;
+  prevDB = disk;
+  useStore.setState({ db: disk });
+  replan();
+  return true;
 }
 
 // Bootstrap
 export async function bootstrap(): Promise<void> {
   await useStore.getState().init();
-  let prev = useStore.getState().db;
+  prevDB = useStore.getState().db;
   useStore.subscribe((s) => {
-    if (!s.ready || s.db === prev) return;
-    const tasksOrPlan = s.db.tasks !== prev.tasks || s.db.schedule !== prev.schedule || s.db.settings !== prev.settings;
-    prev = s.db;
-    window.clearTimeout(saveTimer);
-    saveTimer = window.setTimeout(flush, 400);
+    if (!s.ready || !prevDB || s.db === prevDB) return;
+    const tasksOrPlan = s.db.tasks !== prevDB.tasks || s.db.schedule !== prevDB.schedule || s.db.settings !== prevDB.settings;
+    prevDB = s.db;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(flush, 400);
     if (tasksOrPlan) replan();
   });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') { if (saveTimer !== undefined) flush(); }
-    else replan();
+    else void syncFromDisk();
   });
   if (isNative()) {
-    void CapApp.addListener('appStateChange', (st) => { if (!st.isActive && saveTimer !== undefined) flush(); if (st.isActive) replan(); });
+    void CapApp.addListener('appStateChange', (st) => {
+      if (!st.isActive && saveTimer !== undefined) flush();
+    });
   }
   replan(true);
   void refreshWidgets();

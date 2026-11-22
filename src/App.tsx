@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { App as CapApp } from '@capacitor/app';
-import { useStore } from './data/store.ts';
+import { useStore, syncFromDisk } from './data/store.ts';
 import { TabBar } from './ui/TabBar.tsx';
 import { Toasts } from './ui/Toasts.tsx';
 import { Week } from './screens/Week.tsx';
@@ -37,6 +37,13 @@ export function App() {
       else if (s.openNote) s.setOpenNote(null);
       else if (s.tab !== 'week') s.setTab('week');
       else void CapApp.exitApp();
+    });
+    return () => { void sub.then((h) => h.remove()); };
+  }, []);
+
+  useEffect(() => {
+    const sub = CapApp.addListener('appStateChange', (st) => {
+      if (st.isActive) void syncFromDisk();
     });
     return () => { void sub.then((h) => h.remove()); };
   }, []);

@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { getPendingSharedText, listenSharedText, initIntentListener } from '../src/data/intent.ts';
-import { useStore } from '../src/data/store.ts';
+import { useStore, syncFromDisk } from '../src/data/store.ts';
 import { parseWaPaste } from '../src/lib/wa.ts';
+import { createDB } from '../src/lib/model.ts';
 
 test('intent: fallback aman di lingkungan non-native', async () => {
   const pending = await getPendingSharedText();
@@ -45,4 +46,43 @@ test('intent & paste: deteksi duplikat tugas dari db.tasks', () => {
 
   assert.equal(isDup0, true);
   assert.equal(isDup1, false);
+});
+
+test('syncFromDisk: memuat pembaruan hanya jika revisi disk lebih baru', async () => {
+  let mockStorage: Record<string, string> = {};
+  const orig = globalThis.localStorage;
+  (globalThis as unknown as { localStorage: unknown }).localStorage = {
+    getItem: (k: string) => mockStorage[k] ?? null,
+    setItem: (k: string, v: string) => { mockStorage[k] = v; },
+    removeItem: (k: string) => { delete mockStorage[k]; },
+    clear: () => { mockStorage = {}; },
+    length: 0,
+    key: () => null,
+  };
+
+  try {
+    const base = createDB();
+    base.rev = 5;
+    useStore.setState({ db: base });
+
+    const older = { ...base, rev: 4 };
+    mockStorage['noted-db'] = JSON.stringify(older);
+    const updated1 = await syncFromDisk();
+    assert.equal(updated1, false);
+    assert.equal(useStore.getState().db.rev, 5);
+
+    mockStorage['noted-db'] = JSON.stringify(base);
+    const updated2 = await syncFromDisk();
+    assert.equal(updated2, false);
+    assert.equal(useStore.getState().db.rev, 5);
+
+    const newer = { ...base, rev: 6, tasks: [{ id: 'w1', title: 'Dari Widget', done: true, createdAt: '' }] };
+    mockStorage['noted-db'] = JSON.stringify(newer);
+    const updated3 = await syncFromDisk();
+    assert.equal(updated3, true);
+    assert.equal(useStore.getState().db.rev, 6);
+    assert.equal(useStore.getState().db.tasks[0]?.title, 'Dari Widget');
+  } finally {
+    (globalThis as unknown as { localStorage: unknown }).localStorage = orig;
+  }
 });
