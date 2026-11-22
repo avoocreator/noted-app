@@ -33,6 +33,18 @@ export type Schedule = string[][];
 export type ThemeMode = 'auto' | 'light' | 'dark';
 export type Accent = 'indigo' | 'green' | 'orange' | 'pink';
 
+export interface GCalEvent {
+  id: string;
+  title: string;
+  date: string;
+  time?: string;
+  endTime?: string;
+  location?: string;
+  allDay: boolean;
+  htmlLink?: string;
+  updatedAt: string;
+}
+
 export interface Settings {
   remindersOn: boolean;
   defaultTime: string;
@@ -43,6 +55,9 @@ export interface Settings {
   theme: ThemeMode;
   accent: Accent;
   lastBackup?: string;
+  gcalEnabled: boolean;
+  gcalAutoSync: boolean;
+  gcalLastSync?: string;
 }
 
 export interface DB {
@@ -51,6 +66,7 @@ export interface DB {
   tasks: Task[];
   notes: Note[];
   schedule: Schedule;
+  gcalEvents: GCalEvent[];
   settings: Settings;
 }
 
@@ -66,9 +82,11 @@ export const defaultSettings = (): Settings => ({
   bagTime: '19:30',
   theme: 'auto',
   accent: 'pink',
+  gcalEnabled: false,
+  gcalAutoSync: true,
 });
 
-export const createDB = (): DB => ({ v: 1, rev: 0, tasks: [], notes: [], schedule: emptySchedule(), settings: defaultSettings() });
+export const createDB = (): DB => ({ v: 1, rev: 0, tasks: [], notes: [], schedule: emptySchedule(), gcalEvents: [], settings: defaultSettings() });
 
 export function newId(): string {
   const c = (globalThis as { crypto?: { randomUUID?: () => string } }).crypto;
@@ -119,6 +137,24 @@ function coerceSchedule(x: unknown): Schedule {
   return out;
 }
 
+function coerceGCalEvent(x: unknown): GCalEvent | null {
+  if (!x || typeof x !== 'object') return null;
+  const r = x as Record<string, unknown>;
+  const id = str(r.id, 200);
+  const title = str(r.title, 500);
+  const date = typeof r.date === 'string' && parseYmd(r.date) ? r.date : undefined;
+  if (!id || !title || !date) return null;
+  const time = typeof r.time === 'string' && TIME.test(r.time) ? r.time : undefined;
+  const endTime = typeof r.endTime === 'string' && TIME.test(r.endTime) ? r.endTime : undefined;
+  return {
+    id, title, date, time, endTime,
+    location: str(r.location, 300),
+    allDay: r.allDay === true,
+    htmlLink: str(r.htmlLink, 1000),
+    updatedAt: str(r.updatedAt, 40) ?? new Date().toISOString(),
+  };
+}
+
 // Migration
 export function migrate(raw: unknown): DB {
   const base = createDB();
@@ -133,6 +169,7 @@ export function migrate(raw: unknown): DB {
     tasks: Array.isArray(r.tasks) ? r.tasks.map(coerceTask).filter((t): t is Task => t !== null) : [],
     notes: Array.isArray(r.notes) ? r.notes.map(coerceNote).filter((n): n is Note => n !== null) : [],
     schedule: coerceSchedule(r.schedule),
+    gcalEvents: Array.isArray(r.gcalEvents) ? r.gcalEvents.map(coerceGCalEvent).filter((e): e is GCalEvent => e !== null) : [],
     settings: {
       remindersOn: typeof s.remindersOn === 'boolean' ? s.remindersOn : d.remindersOn,
       defaultTime: time(s.defaultTime, d.defaultTime, true),
@@ -143,6 +180,9 @@ export function migrate(raw: unknown): DB {
       theme: oneOf(s.theme, ['auto', 'light', 'dark'] as const) ?? d.theme,
       accent: oneOf(s.accent, ['indigo', 'green', 'orange', 'pink'] as const) ?? d.accent,
       lastBackup: str(s.lastBackup, 40),
+      gcalEnabled: typeof s.gcalEnabled === 'boolean' ? s.gcalEnabled : d.gcalEnabled,
+      gcalAutoSync: typeof s.gcalAutoSync === 'boolean' ? s.gcalAutoSync : d.gcalAutoSync,
+      gcalLastSync: str(s.gcalLastSync, 40),
     },
   };
 }

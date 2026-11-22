@@ -69,13 +69,41 @@ export function Bag() {
         </div>
       )}
 
-      {bag.subjects.length > 0 && (
-        <section className="panel blue">
-          <h3>Pelajaran besok <i>{bag.subjects.length}</i></h3>
-          <div className="chips static">{bag.subjects.map((s) => <span key={s} className="chip">{s}</span>)}</div>
+      {bag.subjects.length > 0 ? (
+        <section className="sched-card">
+          <div className="sched-card-head">
+            <div className="sched-card-title">
+              <span className="sched-badge-icon"><Icon name="calendar" size={16} /></span>
+              <h3>Pelajaran Besok</h3>
+              <span className="sched-count-badge">{bag.subjects.length} mapel</span>
+            </div>
+            <button className="sched-edit-btn" onClick={() => setScheduleOpen(true)}>
+              Ubah jadwal
+            </button>
+          </div>
+          <div className="sched-pill-grid">
+            {bag.subjects.map((s, idx) => (
+              <div key={s + idx} className="sched-pill">
+                <span className="sched-num">{idx + 1}</span>
+                <span className="sched-name">{s}</span>
+              </div>
+            ))}
+          </div>
         </section>
-      )}
-      {scheduled && bag.subjects.length === 0 && <p className="muted">Tidak ada pelajaran di jadwal untuk {bag.dayName}.</p>}
+      ) : scheduled ? (
+        <div className="sched-card empty-sched">
+          <div className="sched-card-head">
+            <div className="sched-card-title">
+              <span className="sched-badge-icon"><Icon name="calendar" size={16} /></span>
+              <h3>Pelajaran {bag.dayName}</h3>
+            </div>
+            <button className="sched-edit-btn" onClick={() => setScheduleOpen(true)}>
+              Atur jadwal
+            </button>
+          </div>
+          <p className="muted small">Tidak ada jam pelajaran untuk hari {bag.dayName}.</p>
+        </div>
+      ) : null}
 
       {list('Kumpul', kumpul)}
       {list('Bawa', bawa)}

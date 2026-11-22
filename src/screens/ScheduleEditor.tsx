@@ -69,60 +69,121 @@ export function ScheduleEditor() {
       <div className="daytabs" role="tablist">
         {SCHOOL_DAYS.map((d) => (
           <button key={d} role="tab" aria-selected={day === d} className={day === d ? 'on' : ''} onClick={() => setDay_(d)}>
-            {DAYS_ID[d].slice(0, 3)}{(schedule[d]?.length ?? 0) > 0 && <i>{schedule[d].length}</i>}
+            <span>{DAYS_ID[d].slice(0, 3)}</span>
+            {(schedule[d]?.length ?? 0) > 0 && <span className="tab-badge">{schedule[d].length}</span>}
           </button>
         ))}
       </div>
-      <h3 className="sub">{DAYS_ID[day]}</h3>
+      <div className="day-head-row">
+        <h3 className="sub">{DAYS_ID[day]}</h3>
+        {list.length > 0 && <span className="muted small">{list.length} mata pelajaran</span>}
+      </div>
 
-      {list.length === 0 ? <p className="muted">Belum ada mapel. Ketuk mapel di bawah sesuai urutan jam pelajaran.</p> : (
+      {list.length === 0 ? (
+        <div className="empty-day-state">
+          <p className="muted">Belum ada mata pelajaran untuk hari {DAYS_ID[day]}.</p>
+          <span className="small muted">Pilih dari rekomendasi di bawah atau ketik nama mapel.</span>
+        </div>
+      ) : (
         <ol className="sched">
           {list.map((s, i) => (
             <li key={i + s}>
-              <span className="n">{i + 1}</span><span className="grow">{s}</span>
-              <button className="icon-btn" aria-label={`Naikkan ${s}`} onClick={() => move(i, -1)} disabled={i === 0}><Icon name="up" size={18} /></button>
-              <button className="icon-btn" aria-label={`Turunkan ${s}`} onClick={() => move(i, 1)} disabled={i === list.length - 1}><Icon name="down" size={18} /></button>
-              <button className="icon-btn" aria-label={`Hapus ${s}`} onClick={() => put(list.filter((_, j) => j !== i))}><Icon name="x" size={18} /></button>
+              <span className="n">{i + 1}</span>
+              <span className="grow">{s}</span>
+              <div className="sched-actions">
+                <button className="icon-btn" aria-label={`Naikkan ${s}`} onClick={() => move(i, -1)} disabled={i === 0}>
+                  <Icon name="up" size={16} />
+                </button>
+                <button className="icon-btn" aria-label={`Turunkan ${s}`} onClick={() => move(i, 1)} disabled={i === list.length - 1}>
+                  <Icon name="down" size={16} />
+                </button>
+                <button className="icon-btn danger" aria-label={`Hapus ${s}`} onClick={() => put(list.filter((_, j) => j !== i))}>
+                  <Icon name="x" size={16} />
+                </button>
+              </div>
             </li>
           ))}
         </ol>
       )}
 
-      <div className="chips" role="group" aria-label="Tambah mapel">
-        {suggestions.map((c) => <button key={c} className="chip" onClick={() => add(c)}>+ {c}</button>)}
+      <div className="sched-add-section">
+        <span className="sched-section-label">Pilihan cepat mapel</span>
+        <div className="chips" role="group" aria-label="Tambah mapel">
+          {suggestions.map((c) => (
+            <button key={c} className="chip" onClick={() => add(c)}>+ {c}</button>
+          ))}
+        </div>
+        <form className="quick" onSubmit={(e) => { e.preventDefault(); add(text); }}>
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Mapel lain (boleh singkatan, mis. KIM)"
+            aria-label="Mapel lain"
+          />
+          <button className="btn primary" type="submit" disabled={!text.trim()}>Tambah</button>
+        </form>
       </div>
-      <form className="quick" onSubmit={(e) => { e.preventDefault(); add(text); }}>
-        <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Mapel lain (boleh singkatan, mis. KIM)" aria-label="Mapel lain" />
-        <button className="btn primary" type="submit" disabled={!text.trim()}>Tambah</button>
-      </form>
 
-      <div className="row wrap gap">
-        <label className="inline">Salin dari
-          <select value="" onChange={(e) => { if (e.target.value !== '') setSchedule(copyDay(schedule, Number(e.target.value), day)); }} aria-label="Salin dari hari lain">
+      <div className="day-tools">
+        <label>
+          <span>Salin dari:</span>
+          <select
+            value=""
+            onChange={(e) => {
+              if (e.target.value !== '') setSchedule(copyDay(schedule, Number(e.target.value), day));
+            }}
+            aria-label="Salin dari hari lain"
+          >
             <option value="">pilih hari…</option>
-            {SCHOOL_DAYS.filter((d) => d !== day && (schedule[d]?.length ?? 0) > 0).map((d) => <option key={d} value={d}>{DAYS_ID[d]}</option>)}
+            {SCHOOL_DAYS.filter((d) => d !== day && (schedule[d]?.length ?? 0) > 0).map((d) => (
+              <option key={d} value={d}>{DAYS_ID[d]}</option>
+            ))}
           </select>
         </label>
-        {list.length > 0 && <button className="btn soft" onClick={() => put([])}>Kosongkan hari</button>}
+        {list.length > 0 && (
+          <button className="btn-clear" onClick={() => put([])}>
+            Kosongkan hari
+          </button>
+        )}
       </div>
 
-      <hr />
-      <h3 className="sub">Bagikan ke teman sekelas</h3>
-      <p className="muted">Satu orang cukup mengisi. Yang lain menempel kodenya di bawah atau memindai QR langsung.</p>
-      <div className="row wrap gap">
-        <button className="btn soft" onClick={() => void share()}><Icon name="share" size={18} /> Bagikan teks</button>
-        <button className="btn soft" onClick={() => {
-          if (!hasSchedule(schedule)) { toast('Isi jadwal dulu'); return; }
-          setShowQr(true);
-        }}><Icon name="qr" size={18} /> Tampilkan QR</button>
-        <button className="btn soft" onClick={() => setShowScanner(true)}>
-          <Icon name="camera" size={18} /> Pindai QR
-        </button>
-      </div>
+      <div className="exchange-card">
+        <div className="exchange-head">
+          <span className="sub">Tukar & Bagikan Jadwal</span>
+          <p className="muted small">Satu orang mengisi, teman sekelas tinggal scan QR atau salin kode.</p>
+        </div>
+        <div className="exchange-grid">
+          <button className="btn soft" onClick={() => setShowScanner(true)}>
+            <Icon name="camera" size={18} /> Pindai QR
+          </button>
+          <button
+            className="btn soft"
+            onClick={() => {
+              if (!hasSchedule(schedule)) { toast('Isi jadwal dulu'); return; }
+              setShowQr(true);
+            }}
+          >
+            <Icon name="qr" size={18} /> Tampilkan QR
+          </button>
+          <button className="btn soft" onClick={() => void share()}>
+            <Icon name="share" size={18} /> Salin teks
+          </button>
+        </div>
 
-      <h3 className="sub">Impor dari kode kelas</h3>
-      <textarea className="paste-area" rows={3} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Tempel pesan atau kode NOTED1-… dari temanmu" aria-label="Kode kelas" />
-      <button className="btn soft" disabled={!code.trim()} onClick={importCode}>Impor jadwal</button>
+        <div className="import-box">
+          <textarea
+            className="paste-area compact"
+            rows={2}
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Tempel pesan atau kode NOTED1-… dari temanmu"
+            aria-label="Kode kelas"
+          />
+          <button className="btn primary" disabled={!code.trim()} onClick={importCode}>
+            Impor jadwal
+          </button>
+        </div>
+      </div>
       {showQr && <QrModal title="QR Jadwal Kelas" code={encodeSchedule(schedule)} onClose={() => setShowQr(false)} />}
       {showScanner && <ScannerModal title="Pindai QR Jadwal" onClose={() => setShowScanner(false)} onScan={handleScannedCode} />}
       {pendingSchedule && (
