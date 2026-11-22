@@ -62,14 +62,14 @@
 - Test: `tests/gcal.test.ts`
 
 **Steps:**
-- [ ] Tulis unit test untuk parser event Google Calendar: memetakan objek event Google API (dengan format `start.dateTime` atau `start.date`) menjadi `GCalEvent` lokal, serta pengujian generator URL Web Intent `gcalTemplateUrl(task)`.
-- [ ] Implementasikan parser murni di `src/lib/gcalParser.ts`:
+- [x] Tulis unit test untuk parser event Google Calendar: memetakan objek event Google API (dengan format `start.dateTime` atau `start.date`) menjadi `GCalEvent` lokal, serta pengujian generator URL Web Intent `gcalTemplateUrl(task)`.
+- [x] Implementasikan parser murni di `src/lib/gcalParser.ts`:
   - Mengurai tanggal & jam lokal tanpa bug pergeseran zona waktu.
   - Menghasilkan URL template Google Calendar: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=...&dates=...`.
-- [ ] Buat modul `src/data/gcal.ts`:
+- [x] Buat modul `src/data/gcal.ts`:
   - Fungsi `fetchGCalEvents(token: string)`: memanggil Google Calendar API v3 `GET /calendars/primary/events`.
   - Fungsi `syncGCalEvents(token: string)`: memeriksa status online (`navigator.onLine`), mengambil event, menyaring event yang valid, dan mengembalikan array `GCalEvent[]`.
-- [ ] Jalankan `npm test` dan `npm run build` untuk memverifikasi fungsionalitas dan type safety.
+- [x] Jalankan `npm test` dan `npm run build` untuk memverifikasi fungsionalitas dan type safety.
 
 ---
 
